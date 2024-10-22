@@ -5,8 +5,7 @@ import Topbar from "./scenes/global/Topbar.jsx";
 import Sidebar from "./scenes/global/Sidebar.jsx"
 import Dashboard from "./scenes/dashboard";
 import Users from './scenes/users/index.jsx';
-
-// import Tarefas from "./scenes/tarefas";
+import Tarefas from "./scenes/tarefas/index.jsx";
 
 // import Voluntarios from "./scenes/voluntarios";
 // import Coordenadores from "./scenes/coordenadores";
@@ -34,8 +33,9 @@ function App() {
     <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/users" element={<Users />} />
+      <Route path="/tarefas" element={<Tarefas />} />  
 
-      {/* <Route path="/tarefas" element={<Tarefas />} />  */}
+
       {/* <Route path="/voluntarios" element={<Voluntarios />} /> */}
       {/* <Route path="/coordenadores" element={<Coordenadores />} /> */}
       {/* <Route path="/vagas" element={<Vagas />} /> */}

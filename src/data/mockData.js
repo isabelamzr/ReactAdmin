@@ -38,7 +38,7 @@ export const mockDataUsers = [
 
     },]
 
-export const mockData = [
+export const mockDataTarefas = [
   {
     id: 1,
     nome: "Isabela",

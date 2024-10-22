@@ -55,6 +55,7 @@ const columns = [
           p="5px"
           display="flex"
           justifyContent="center"
+          alignItems="center"
           backgroundColor={
             access === "admin" ? colors.greenAccent[600] : colors.greenAccent[700]
           }

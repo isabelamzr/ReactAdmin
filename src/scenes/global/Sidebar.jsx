@@ -160,7 +160,7 @@ const Sidebar = () => {
 
             <Item
               title="Tarefas"
-              to="/team"
+              to="/tarefas"
               icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
