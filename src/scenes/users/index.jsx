@@ -8,88 +8,121 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 
 const Users = () => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
+const theme = useTheme();
+const colors = tokens(theme.palette.mode);
 
-    const columns = [
-        { field: "id", headerName: "ID" }, 
+const columns = [
+  { field: "id", 
+    headerName: "ID",
+    headerClassName: "custom-header", }, 
 
-        { field: "name", 
-          headerName: "Nome",
-          flex: 1,
-          cellClassName: "name-column--cell",
-        },
+  { field: "name", 
+    headerName: "Nome",
+    flex: 1,
+    cellClassName: "name-column--cell",
+    headerClassName: "custom-header", 
+  },
 
-        { field: "age", 
-            headerName: "Idade",
-            type: "number",
-            headerAlign: "left",
-            align: "left",
-          },
+  { field: "age", 
+    headerName: "Idade",
+    type: "number",
+    headerAlign: "left",
+    align: "left",
+    headerClassName: "custom-header",
+  },
 
-          { field: "phone", 
-            headerName: "Telefone",
-            flex: 1,
-           
-          },
+  { field: "phone", 
+    headerName: "Telefone",
+    flex: 1,
+    headerClassName: "custom-header",
+  },
 
-          { field: "email", 
-            headerName: "E-mail",
-            flex: 1,
-           
-          },
+  { field: "email", 
+    headerName: "E-mail",
+    flex: 1,
+    headerClassName: "custom-header",
+  },
 
-          { field: "access", 
-            headerName: "Nível de acesso",
-            flex: 1,
-            renderCell: ({ row}) => {
-                const access = row.access;
-                return (
-                    <Box
-                    width="60%"
-                    m="0 auto"
-                    p="5px"
-                    display="flex"
-                    justifyContent="center"
-                    backgroundColor = {
-                     access === "admin"
-                        ? colors.greenAccent[600]
-                        : colors.greenAccent[700]
-                    }
-                    borderRadius="4px"
-                    >
-                    {/* container mostrando diferentes icones dependendo do nivel de acesso */}
+  { field: "access", 
+    headerName: "Nível de acesso",
+    flex: 1,
+    headerClassName: "custom-header",
+    renderCell: ({ row: { access } }) => {
+      return (
+        <Box
+          width="60%"
+          m="0 auto"
+          p="5px"
+          display="flex"
+          justifyContent="center"
+          backgroundColor={
+            access === "admin" ? colors.greenAccent[600] : colors.greenAccent[700]
+          }
+          borderRadius="4px"
+        >
+          {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
+          {access === "manager" && <SecurityOutlinedIcon />}
+          {access === "user" && <LockOpenOutlinedIcon />}
 
-                    {access === "admin" && <AdminPanelSettingsOutlinedIcon /> }
-                    {access === "manager" && <SecurityOutlinedIcon /> }
-                    {access === "user" && <LockOpenOutlinedIcon /> }
-
-                    {/* tem 3 niveis de acesso ai, tem que colocar funcionalidade aqui, 
-                    se nao mudo pra 2 e pesquiso como faz pra 1 login só visualizar, buscar, 
-                    e outro login poder apagar, adicionar etc */}
-
-                    <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-                        {access}
-                    </Typography>
-
-                    </Box>
-                )
-            }
-           
-          },
-    ];
-
-    return (
-        <Box>
-            <Header title="Usuários" subtitle="Configuração de acesso dos usuários" />
-            <Box>
-                <DataGrid 
-                rows={mockDataUsers}
-                columns={columns}
-                />
-            </Box>
+          <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
+            {access}
+          </Typography>
         </Box>
-    )
+)
+}
+
+},
+];
+
+return (
+<Box m="20px">
+  <Header title="Usuários" subtitle="Configurações de acesso" />
+  <Box
+    m="40px 0 0 0" 
+    height="75vh" 
+    sx={{
+      "& .MuiDataGrid-root": {
+        border: "none",
+      },
+      "& .MuiDataGrid-cell": {
+        borderBottom: "none",
+      },
+      "& .name-column--cell": {
+        color: colors.greenAccent[300],
+      },
+      "& .custom-header": {
+        backgroundColor: colors.blueAccent[700], 
+        borderBottom: "none",
+      },
+      "& .MuiDataGrid-virtualScroller": {
+        backgroundColor: colors.primary[400],
+      },
+      "& .MuiDataGrid-footerContainer": {
+        borderTop: "none",
+        backgroundColor: colors.blueAccent[700],
+      },
+      "& .MuiDataGrid-columnHeader": {
+        backgroundColor: colors.blueAccent[700], 
+        borderBottom: "none",
+      },
+      "& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-columnHeaderTitleContainer": {
+        backgroundColor: colors.blueAccent[700], 
+      },
+      "& .MuiCheckbox-root": {
+        color: `${colors.greenAccent[200]} !important `,
+      },
+    }}
+  >
+    <DataGrid 
+      checkboxSelection
+      rows={mockDataUsers}
+      columns={columns}
+    />
+</Box>
+</Box>
+
+
+)
 
 }
 

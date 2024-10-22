@@ -7,7 +7,7 @@ export const mockDataUsers = [
       email: "secretaria.aecx@aecx.org.br",
       age: 67,
       phone: "(665)121-5454",
-      acess: "admin"
+      access: "admin"
       
     },
     {
@@ -16,7 +16,7 @@ export const mockDataUsers = [
       email: "candido.andre@uol.com.br",
       age: 63,
       phone: "(421)314-2288",
-      acess: "admin"
+      access: "manager"
      
     },
     {
@@ -25,7 +25,7 @@ export const mockDataUsers = [
       email: "jaimelannister@gmail.com",
       age: 45,
       phone: "(422)982-6739",
-      acess: "admin",
+      access: "user",
   
     },
     {
@@ -34,7 +34,7 @@ export const mockDataUsers = [
       email: "aryastark@gmail.com",
       age: 16,
       phone: "(921)425-6742",
-      acess: "admin"
+      access: "admin"
 
     },]
 
