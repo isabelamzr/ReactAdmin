@@ -20,6 +20,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -132,6 +133,23 @@ const Sidebar = () => {
             />
 
             {/* Condicional para desaparecer ou substituir os títulos */}
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
+              {isCollapsed ? "Users" : "Gestão e Permissões"}
+            </Typography>
+
+            <Item
+              title="Usuários"
+              to="/users"
+              icon={<PermIdentityIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+
+
             <Typography
               variant="h6"
               color={colors.grey[300]}

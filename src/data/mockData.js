@@ -1,5 +1,43 @@
 import { tokens } from "../theme";
 
+export const mockDataUsers = [
+    {
+      id: 1,
+      name: "Gertrudes",
+      email: "secretaria.aecx@aecx.org.br",
+      age: 67,
+      phone: "(665)121-5454",
+      acess: "admin"
+      
+    },
+    {
+      id: 2,
+      name: "Candido Rodrigues",
+      email: "candido.andre@uol.com.br",
+      age: 63,
+      phone: "(421)314-2288",
+      acess: "admin"
+     
+    },
+    {
+      id: 3,
+      name: "Jaime Lannister",
+      email: "jaimelannister@gmail.com",
+      age: 45,
+      phone: "(422)982-6739",
+      acess: "admin",
+  
+    },
+    {
+      id: 4,
+      name: "Arya Stark",
+      email: "aryastark@gmail.com",
+      age: 16,
+      phone: "(921)425-6742",
+      acess: "admin"
+
+    },]
+
 export const mockData = [
   {
     id: 1,
@@ -147,7 +185,8 @@ export const mockData = [
   },
 ];
 
-/**/ 
+
+
 export const mockDataContacts = [
   {
     id: 1,

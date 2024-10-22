@@ -4,7 +4,9 @@ import { Routes, Route } from 'react-router-dom';
 import Topbar from "./scenes/global/Topbar.jsx";
 import Sidebar from "./scenes/global/Sidebar.jsx"
 import Dashboard from "./scenes/dashboard";
-import Tarefas from "./scenes/tarefas";
+import Users from './scenes/users/index.jsx';
+
+// import Tarefas from "./scenes/tarefas";
 
 // import Voluntarios from "./scenes/voluntarios";
 // import Coordenadores from "./scenes/coordenadores";
@@ -31,7 +33,9 @@ function App() {
 
     <Routes>
       <Route path="/" element={<Dashboard />} />
-       <Route path="/tarefas" element={<Tarefas />} /> 
+      <Route path="/users" element={<Users />} />
+
+      {/* <Route path="/tarefas" element={<Tarefas />} />  */}
       {/* <Route path="/voluntarios" element={<Voluntarios />} /> */}
       {/* <Route path="/coordenadores" element={<Coordenadores />} /> */}
       {/* <Route path="/vagas" element={<Vagas />} /> */}
