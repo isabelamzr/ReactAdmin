@@ -3,75 +3,80 @@ import { Box, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
-import { mockDataTarefas } from "../../data/mockData";
+import { mockDataCoordenadores } from "../../data/mockData";
 import Header from "../../components/Header";
 
-const Tarefas = () => {
+const Coordenadores = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Estado para armazenar as tarefas (dados atuais)
-  const [tarefas, setTarefas] = useState(mockDataTarefas);
+  const [coordenadores, setCoordenadores] = useState(mockDataCoordenadores);
 
-  // Estado para armazenar as tarefas deletadas para eventual "refazer"
-  const [tarefasDeletadas, setTarefasDeletadas] = useState([]);
+  const [coordenadoresDeletados, setCoordenadoresDeletados] = useState([]);
 
-  // Estado para armazenar as linhas selecionadas
   const [selectedRows, setSelectedRows] = useState([]);
 
-  // Função para deletar as tarefas selecionadas
   const handleDelete = () => {
     if (selectedRows.length > 0) {
-      // Filtra as tarefas que não estão selecionadas
-      const remainingTarefas = tarefas.filter(
-        (tarefa) => !selectedRows.includes(tarefa.id)
+      const remainingCoordenadores = coordenadores.filter(
+        (coordenador) => !selectedRows.includes(coordenador.id)
       );
 
-      // Armazena as tarefas deletadas
-      const deletadas = tarefas.filter((tarefa) =>
-        selectedRows.includes(tarefa.id)
+      const deletados = coordenadores.filter((coordenador) =>
+        selectedRows.includes(coordenador.id)
       );
-      setTarefasDeletadas(deletadas); // Guardamos as deletadas para o "Refazer"
+      setCoordenadoresDeletados(deletados);
 
-      // Atualiza o estado de tarefas
-      setTarefas(remainingTarefas);
+    
+      setCoordenadores(remainingCoordenadores);
 
-      // Limpa a seleção após a remoção
       setSelectedRows([]);
 
-      console.log("Deletadas:", deletadas);
+      console.log("Deletados:", deletados);
     }
   };
 
-  // Função para refazer (restaurar as tarefas deletadas)
+
   const handleRedo = () => {
-    if (tarefasDeletadas.length > 0) {
-      // Restaura as tarefas deletadas adicionando-as de volta à lista de tarefas
-      const restauradas = [...tarefas, ...tarefasDeletadas];
-      setTarefas(restauradas); // Atualiza o estado de tarefas com as restauradas
-      setTarefasDeletadas([]); // Limpa as tarefas deletadas, pois já foram restauradas
-      console.log("Restauradas:", tarefasDeletadas);
+    if (coordenadoresDeletados.length > 0) {
+   
+      const restauradas = [...coordenadores, ...coordenadoresDeletados];
+      setCoordenadores(restauradas); 
+      setCoordenadoresDeletados([]); 
+      console.log("Restaurados:", coordenadoresDeletados);
     }
   };
 
-  // Colunas do DataGrid
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.5 },
+    { field: "id", headerName: "ID" },
+
     {
-      field: "dia",
-      headerName: "Dia",
+      field: "nome",
+      headerName: "Nome",
       flex: 1,
       cellClassName: "name-column--cell",
     },
-    { field: "horario", headerName: "Horário", flex: 1 },
-    { field: "tipo_tarefa_id", headerName: "Tarefa", flex: 1 },
-    { field: "coordenador_id", headerName: "Coordenador", flex: 1 },
-    { field: "unidade_id", headerName: "Unidade", flex: 1 },
-    { field: "voluntario_id", headerName: "Voluntário", flex: 1 },
-    { field: "local", headerName: "Local", flex: 1 },
+
+    {
+      field: "telefone",
+      headerName: "Telefone",
+      flex: 1,
+    },
+
+    {
+      field: "email",
+      headerName: "E-mail",
+      flex: 1,
+    },
+
+    {
+      field: "genero",
+      headerName: "Gênero",
+      flex: 1,
+    },
+
   ];
 
-  // Personaliza os textos para o DataGrid
   const customLocaleText = {
     ...ptBR.components.MuiDataGrid.defaultProps.localeText,
     filterOperatorDoesNotContain: "não contém",
@@ -81,7 +86,7 @@ const Tarefas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Tarefas" subtitle="Gerenciador de tarefas" />
+      <Header title="Coordenadores" subtitle="Gerenciamento de Coordenadores Ativos" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -95,17 +100,26 @@ const Tarefas = () => {
           "& .name-column--cell": {
             color: colors.greenAccent[300],
           },
+
+          "& .custom-header": {
+            backgroundColor: colors.blueAccent[700],
+            borderBottom: "none",
+          },
+
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: colors.primary[400],
+          },
+
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
           },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
+
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
             backgroundColor: colors.blueAccent[700],
           },
+
           "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
             color: `${colors.grey[100]} !important`,
           },
@@ -113,12 +127,12 @@ const Tarefas = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={tarefas}
+          rows={coordenadores}
           columns={columns}
           localeText={customLocaleText}
           slots={{ toolbar: GridToolbar }}
           onRowSelectionModelChange={(newSelectionModel) => {
-            setSelectedRows(newSelectionModel); // Atualiza o estado com as linhas selecionadas
+            setSelectedRows(newSelectionModel);
           }}
         />
       </Box>
@@ -143,15 +157,15 @@ const Tarefas = () => {
           variant="contained"
           sx={{
             backgroundColor:
-              tarefasDeletadas.length > 0 ? "#2e7d32" : "#81c784",
+              coordenadoresDeletados.length > 0 ? "#2e7d32" : "#81c784",
             color: "#fff",
-            cursor: tarefasDeletadas.length > 0 ? "pointer" : "not-allowed",
+            cursor: coordenadoresDeletados.length > 0 ? "pointer" : "not-allowed",
             "&:hover": {
               backgroundColor:
-                tarefasDeletadas.length > 0 ? "#1b5e20" : "#81c784",
+                coordenadoresDeletados.length > 0 ? "#1b5e20" : "#81c784",
             },
           }}
-          disabled={tarefasDeletadas.length === 0}
+          disabled={coordenadoresDeletados.length === 0}
           onClick={handleRedo}
         >
           Refazer
@@ -161,4 +175,4 @@ const Tarefas = () => {
   );
 };
 
-export default Tarefas;
+export default Coordenadores;

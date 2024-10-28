@@ -6,16 +6,17 @@ import Sidebar from "./scenes/global/Sidebar.jsx"
 import Dashboard from "./scenes/dashboard";
 import Users from './scenes/users/index.jsx';
 import Tarefas from "./scenes/tarefas/index.jsx";
+import Voluntarios from "./scenes/voluntarios";
+import Coordenadores from "./scenes/coordenadores";
+import Vagas from "./scenes/vagas";
+import FormVagas from "./scenes/formVagas";
+import FormVoluntarios from "./scenes/formVoluntarios";
+import FormCoordenadores from './scenes/formCoordenadores/index.jsx';
 
-// import Voluntarios from "./scenes/voluntarios";
-// import Coordenadores from "./scenes/coordenadores";
-// import Vagas from "./scenes/vagas";
-// import FormVagas from "./scenes/formvagas";
-// import FormVoluntarios from "./scenes/formvoluntarios";
-// import FormCoodernadores from "./scenes/formcoodernadores";
+
 // import Calendar from "./scenes/calendar"
 // import DoaçoesChart from "./scenes/doaçoeschart";
-// import TarefasChart from "./scenes/tarefaschart";
+
 
 
 function App() {
@@ -34,25 +35,27 @@ function App() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/users" element={<Users />} />
       <Route path="/tarefas" element={<Tarefas />} />  
+      <Route path="/voluntarios" element={<Voluntarios />} />
+      <Route path="/coordenadores" element={<Coordenadores />} /> 
+      <Route path="/vagas" element={<Vagas />} /> 
+      <Route path="/formVagas" element={<FormVagas />} /> 
+      <Route path="/formVoluntarios" element={<FormVoluntarios />} />
+      <Route path="/formCoordenadores" element={<FormCoordenadores />} />
 
 
-      {/* <Route path="/voluntarios" element={<Voluntarios />} /> */}
-      {/* <Route path="/coordenadores" element={<Coordenadores />} /> */}
-      {/* <Route path="/vagas" element={<Vagas />} /> */}
-      {/* <Route path="/formVagas" element={<FormVagas />} /> */}
-      {/* <Route path="/formVoluntarios" element={<FormVoluntarios />} /> */}
-      {/* <Route path="/formCoodernadores" element={<FormCoodernadores />} /> */}
       {/* <Route path="/doaçoesChart" element={<DoaçoesChart />} /> */}
       {/* <Route path="/tarefasChart" element={<TarefasChart />} /> */}
       {/* <Route path="/calendar" element={<Calendar />} /> */}
+
     </Routes>
 
   </main>  
   </div>
+
   </ThemeProvider>
   </ColorModeContext.Provider>
-  );
 
+  );
 }
 
 export default App;

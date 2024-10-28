@@ -167,14 +167,14 @@ const Sidebar = () => {
             />
             <Item
               title="Voluntários"
-              to="/contacts"
+              to="/voluntarios"
               icon={<GroupIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Coordenadores"
-              to="/invoices"
+              to="/coordenadores"
               icon={<PeopleOutlineIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -182,7 +182,7 @@ const Sidebar = () => {
 
             <Item
               title="Vagas"
-              to="/invoices"
+              to="/vagas"
               icon={<ImportContactsIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -198,21 +198,21 @@ const Sidebar = () => {
 
             <Item
               title="Vagas"
-              to="/form"
+              to="/formVagas"
               icon={<PostAddIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Voluntários"
-              to="/calendar"
+              to="/formVoluntarios"
               icon={<GroupAddIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Coordenadores"
-              to="/faq"
+              to="/formCoordenadores"
               icon={<GroupAddIcon />}
               selected={selected}
               setSelected={setSelected}
