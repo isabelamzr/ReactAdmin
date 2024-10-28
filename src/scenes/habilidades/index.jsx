@@ -3,66 +3,44 @@ import { Box, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
-import { mockDataTarefas } from "../../data/mockData";
+import { mockDataHabilidades } from "../../data/mockData";
 import Header from "../../components/Header";
 
-const Tarefas = () => {
+const Habilidades = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  
-  const [tarefas, setTarefas] = useState(mockDataTarefas);
-
-  const [tarefasDeletadas, setTarefasDeletadas] = useState([]);
-  
+  const [habilidades, setHabilidades] = useState(mockDataHabilidades);
+  const [habilidadesDeletadas, setHabilidadesDeletadas] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  
+
   const handleDelete = () => {
     if (selectedRows.length > 0) {
-     
-      const remainingTarefas = tarefas.filter(
-        (tarefa) => !selectedRows.includes(tarefa.id)
+      const remainingHabilidades = habilidades.filter(
+        (habilidade) => !selectedRows.includes(habilidade.id)
       );
 
-      const deletadas = tarefas.filter((tarefa) =>
-        selectedRows.includes(tarefa.id)
+      const deletadas = habilidades.filter((habilidade) =>
+        selectedRows.includes(habilidade.id)
       );
-      setTarefasDeletadas(deletadas); 
 
-      setTarefas(remainingTarefas);
-
-    
+      setHabilidadesDeletadas(deletadas);
+      setHabilidades(remainingHabilidades);
       setSelectedRows([]);
-
-      console.log("Deletadas:", deletadas);
     }
   };
 
   const handleRedo = () => {
-    if (tarefasDeletadas.length > 0) {
-     
-      const restauradas = [...tarefas, ...tarefasDeletadas];
-      setTarefas(restauradas); 
-      setTarefasDeletadas([]); 
-      console.log("Restauradas:", tarefasDeletadas);
+    if (habilidadesDeletadas.length > 0) {
+      setHabilidades([...habilidades, ...habilidadesDeletadas]);
+      setHabilidadesDeletadas([]);
     }
   };
-
-
+  
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
-    {
-      field: "dia",
-      headerName: "Dia",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    { field: "horario", headerName: "Horário", flex: 1 },
-    { field: "tipo_tarefa_id", headerName: "Tarefa", flex: 1 },
-    { field: "coordenador_id", headerName: "Coordenador", flex: 1 },
-    { field: "unidade_id", headerName: "Unidade", flex: 1 },
-    { field: "voluntario_id", headerName: "Voluntário", flex: 1 },
-    { field: "local", headerName: "Local", flex: 1 },
+    { field: "descricao", headerName: "Descrição", flex: 1 },
+    { field: "talentos", headerName: "Talentos", flex: 1 },
   ];
 
   const customLocaleText = {
@@ -74,7 +52,8 @@ const Tarefas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Tarefas" subtitle="Gerenciador de tarefas" />
+      <Header title="Habilidades" subtitle="Gerencie as competências e especialidades dos voluntários" />
+      
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -84,9 +63,6 @@ const Tarefas = () => {
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: colors.blueAccent[700],
@@ -106,7 +82,7 @@ const Tarefas = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={tarefas}
+          rows={habilidades}
           columns={columns}
           localeText={customLocaleText}
           slots={{ toolbar: GridToolbar }}
@@ -115,6 +91,7 @@ const Tarefas = () => {
           }}
         />
       </Box>
+      
       <Box display="flex" justifyContent="end" mt="20px">
         <Button
           variant="contained"
@@ -132,19 +109,18 @@ const Tarefas = () => {
         >
           Deletar
         </Button>
+        
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              tarefasDeletadas.length > 0 ? "#2e7d32" : "#81c784",
+            backgroundColor: habilidadesDeletadas.length > 0 ? "#2e7d32" : "#81c784",
             color: "#fff",
-            cursor: tarefasDeletadas.length > 0 ? "pointer" : "not-allowed",
+            cursor: habilidadesDeletadas.length > 0 ? "pointer" : "not-allowed",
             "&:hover": {
-              backgroundColor:
-                tarefasDeletadas.length > 0 ? "#1b5e20" : "#81c784",
+              backgroundColor: habilidadesDeletadas.length > 0 ? "#1b5e20" : "#81c784",
             },
           }}
-          disabled={tarefasDeletadas.length === 0}
+          disabled={habilidadesDeletadas.length === 0}
           onClick={handleRedo}
         >
           Refazer
@@ -154,4 +130,4 @@ const Tarefas = () => {
   );
 };
 
-export default Tarefas;
+export default Habilidades;

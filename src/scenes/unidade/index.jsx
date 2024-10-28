@@ -3,66 +3,48 @@ import { Box, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
-import { mockDataTarefas } from "../../data/mockData";
+import { mockDataUnidade } from "../../data/mockData";
 import Header from "../../components/Header";
 
-const Tarefas = () => {
+const Unidade = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  
-  const [tarefas, setTarefas] = useState(mockDataTarefas);
-
-  const [tarefasDeletadas, setTarefasDeletadas] = useState([]);
-  
+  const [unidades, setUnidades] = useState(mockDataUnidade);
+  const [unidadesDeletadas, setUnidadesDeletadas] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  
+
   const handleDelete = () => {
     if (selectedRows.length > 0) {
-     
-      const remainingTarefas = tarefas.filter(
-        (tarefa) => !selectedRows.includes(tarefa.id)
+      const remainingUnidades = unidades.filter(
+        (unidade) => !selectedRows.includes(unidade.id)
       );
 
-      const deletadas = tarefas.filter((tarefa) =>
-        selectedRows.includes(tarefa.id)
+      const deletadas = unidades.filter((unidade) =>
+        selectedRows.includes(unidade.id)
       );
-      setTarefasDeletadas(deletadas); 
 
-      setTarefas(remainingTarefas);
-
-    
+      setUnidadesDeletadas(deletadas);
+      setUnidades(remainingUnidades);
       setSelectedRows([]);
-
-      console.log("Deletadas:", deletadas);
     }
   };
 
   const handleRedo = () => {
-    if (tarefasDeletadas.length > 0) {
-     
-      const restauradas = [...tarefas, ...tarefasDeletadas];
-      setTarefas(restauradas); 
-      setTarefasDeletadas([]); 
-      console.log("Restauradas:", tarefasDeletadas);
+    if (unidadesDeletadas.length > 0) {
+      setUnidades([...unidades, ...unidadesDeletadas]);
+      setUnidadesDeletadas([]);
     }
   };
-
-
+  
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.5 },
-    {
-      field: "dia",
-      headerName: "Dia",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    { field: "horario", headerName: "Horário", flex: 1 },
-    { field: "tipo_tarefa_id", headerName: "Tarefa", flex: 1 },
-    { field: "coordenador_id", headerName: "Coordenador", flex: 1 },
-    { field: "unidade_id", headerName: "Unidade", flex: 1 },
-    { field: "voluntario_id", headerName: "Voluntário", flex: 1 },
-    { field: "local", headerName: "Local", flex: 1 },
+    { field: "id", headerName: "ID", flex: 0.3 },
+    { field: "nome", headerName: "Nome", flex: 1 },
+    { field: "endereco", headerName: "Endereço", flex: 1.5 },
+    { field: "telefone", headerName: "Telefone", flex: 1 },
+    { field: "bairro", headerName: "Bairro", flex: 1 },
+    { field: "cidade", headerName: "Cidade", flex: 1 },
+    { field: "UF", headerName: "UF", flex: 0.5 },
   ];
 
   const customLocaleText = {
@@ -74,20 +56,14 @@ const Tarefas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Tarefas" subtitle="Gerenciador de tarefas" />
+      <Header title="Unidade" subtitle="Gerencie as unidades das associações e seus detalhes" />
+      
       <Box
         m="40px 0 0 0"
         height="75vh"
         sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
+          "& .MuiDataGrid-root": { border: "none" },
+          "& .MuiDataGrid-cell": { borderBottom: "none" },
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
@@ -106,7 +82,7 @@ const Tarefas = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={tarefas}
+          rows={unidades}
           columns={columns}
           localeText={customLocaleText}
           slots={{ toolbar: GridToolbar }}
@@ -115,6 +91,7 @@ const Tarefas = () => {
           }}
         />
       </Box>
+      
       <Box display="flex" justifyContent="end" mt="20px">
         <Button
           variant="contained"
@@ -132,19 +109,18 @@ const Tarefas = () => {
         >
           Deletar
         </Button>
+        
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              tarefasDeletadas.length > 0 ? "#2e7d32" : "#81c784",
+            backgroundColor: unidadesDeletadas.length > 0 ? "#2e7d32" : "#81c784",
             color: "#fff",
-            cursor: tarefasDeletadas.length > 0 ? "pointer" : "not-allowed",
+            cursor: unidadesDeletadas.length > 0 ? "pointer" : "not-allowed",
             "&:hover": {
-              backgroundColor:
-                tarefasDeletadas.length > 0 ? "#1b5e20" : "#81c784",
+              backgroundColor: unidadesDeletadas.length > 0 ? "#1b5e20" : "#81c784",
             },
           }}
-          disabled={tarefasDeletadas.length === 0}
+          disabled={unidadesDeletadas.length === 0}
           onClick={handleRedo}
         >
           Refazer
@@ -154,4 +130,4 @@ const Tarefas = () => {
   );
 };
 
-export default Tarefas;
+export default Unidade;

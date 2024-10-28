@@ -3,66 +3,44 @@ import { Box, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
-import { mockDataTarefas } from "../../data/mockData";
+import { mockDataTipoTarefa } from "../../data/mockData";
 import Header from "../../components/Header";
 
-const Tarefas = () => {
+const TipoTarefas = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  
-  const [tarefas, setTarefas] = useState(mockDataTarefas);
-
-  const [tarefasDeletadas, setTarefasDeletadas] = useState([]);
-  
+  const [tipoTarefas, setTipoTarefas] = useState(mockDataTipoTarefa);
+  const [tipoTarefasDeletadas, setTipoTarefasDeletadas] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  
+
   const handleDelete = () => {
     if (selectedRows.length > 0) {
-     
-      const remainingTarefas = tarefas.filter(
+      const remainingTipoTarefas = tipoTarefas.filter(
         (tarefa) => !selectedRows.includes(tarefa.id)
       );
 
-      const deletadas = tarefas.filter((tarefa) =>
+      const deletadas = tipoTarefas.filter((tarefa) =>
         selectedRows.includes(tarefa.id)
       );
-      setTarefasDeletadas(deletadas); 
 
-      setTarefas(remainingTarefas);
-
-    
+      setTipoTarefasDeletadas(deletadas);
+      setTipoTarefas(remainingTipoTarefas);
       setSelectedRows([]);
-
-      console.log("Deletadas:", deletadas);
     }
   };
 
   const handleRedo = () => {
-    if (tarefasDeletadas.length > 0) {
-     
-      const restauradas = [...tarefas, ...tarefasDeletadas];
-      setTarefas(restauradas); 
-      setTarefasDeletadas([]); 
-      console.log("Restauradas:", tarefasDeletadas);
+    if (tipoTarefasDeletadas.length > 0) {
+      setTipoTarefas([...tipoTarefas, ...tipoTarefasDeletadas]);
+      setTipoTarefasDeletadas([]);
     }
   };
-
-
+  
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
-    {
-      field: "dia",
-      headerName: "Dia",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    { field: "horario", headerName: "Horário", flex: 1 },
-    { field: "tipo_tarefa_id", headerName: "Tarefa", flex: 1 },
-    { field: "coordenador_id", headerName: "Coordenador", flex: 1 },
-    { field: "unidade_id", headerName: "Unidade", flex: 1 },
-    { field: "voluntario_id", headerName: "Voluntário", flex: 1 },
-    { field: "local", headerName: "Local", flex: 1 },
+    { field: "nome_tarefa", headerName: "Nome Tarefa", flex: 1 },
+    { field: "descricao", headerName: "Descrição", flex: 2 },
   ];
 
   const customLocaleText = {
@@ -74,20 +52,14 @@ const Tarefas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Tarefas" subtitle="Gerenciador de tarefas" />
+      <Header title="Tipo Tarefas" subtitle="Gerencie os tipos de tarefas disponíveis" />
+      
       <Box
         m="40px 0 0 0"
         height="75vh"
         sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
+          "& .MuiDataGrid-root": { border: "none" },
+          "& .MuiDataGrid-cell": { borderBottom: "none" },
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
@@ -106,7 +78,7 @@ const Tarefas = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={tarefas}
+          rows={tipoTarefas}
           columns={columns}
           localeText={customLocaleText}
           slots={{ toolbar: GridToolbar }}
@@ -115,6 +87,7 @@ const Tarefas = () => {
           }}
         />
       </Box>
+      
       <Box display="flex" justifyContent="end" mt="20px">
         <Button
           variant="contained"
@@ -132,19 +105,18 @@ const Tarefas = () => {
         >
           Deletar
         </Button>
+        
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              tarefasDeletadas.length > 0 ? "#2e7d32" : "#81c784",
+            backgroundColor: tipoTarefasDeletadas.length > 0 ? "#2e7d32" : "#81c784",
             color: "#fff",
-            cursor: tarefasDeletadas.length > 0 ? "pointer" : "not-allowed",
+            cursor: tipoTarefasDeletadas.length > 0 ? "pointer" : "not-allowed",
             "&:hover": {
-              backgroundColor:
-                tarefasDeletadas.length > 0 ? "#1b5e20" : "#81c784",
+              backgroundColor: tipoTarefasDeletadas.length > 0 ? "#1b5e20" : "#81c784",
             },
           }}
-          disabled={tarefasDeletadas.length === 0}
+          disabled={tipoTarefasDeletadas.length === 0}
           onClick={handleRedo}
         >
           Refazer
@@ -154,4 +126,4 @@ const Tarefas = () => {
   );
 };
 
-export default Tarefas;
+export default TipoTarefas;

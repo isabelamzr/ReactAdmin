@@ -218,7 +218,7 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
 
-            {/* DOMÍNIO */}
+            {/* TABELAS DE DOMÍNIO */}
 
             <Typography
               variant="h6"
@@ -230,7 +230,7 @@ const Sidebar = () => {
 
             <Item
               title="Unidade"
-              to="/line"
+              to="/unidade"
               icon={<HomeWorkIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -238,7 +238,7 @@ const Sidebar = () => {
 
             <Item
               title="Status Vagas"
-              to="/line"
+              to="/statusVagas"
               icon={<AssignmentTurnedInIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -246,7 +246,7 @@ const Sidebar = () => {
 
             <Item
               title="Tipo Tarefa"
-              to="/team"
+              to="/tipoTarefa"
               icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -254,7 +254,7 @@ const Sidebar = () => {
 
             <Item
               title="Habilidades"
-              to="/invoices"
+              to="/habilidades"
               icon={<EmojiObjectsIcon />}
               selected={selected}
               setSelected={setSelected}

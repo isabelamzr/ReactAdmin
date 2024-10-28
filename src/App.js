@@ -13,6 +13,10 @@ import FormVagas from "./scenes/formVagas";
 import FormVoluntarios from "./scenes/formVoluntarios";
 import FormCoordenadores from './scenes/formCoordenadores/index.jsx';
 import Calendar from "./scenes/calendar"
+import Habilidades from "./scenes/habilidades/index.jsx"
+import StatusVagas from "./scenes/statusVagas/index.jsx"
+import TipoTarefa from "./scenes/tipoTarefa/index.jsx"
+import Unidade from "./scenes/unidade/index.jsx"
 
 
 // import DoaçoesChart from "./scenes/doaçoeschart";
@@ -42,6 +46,10 @@ function App() {
       <Route path="/formVoluntarios" element={<FormVoluntarios />} />
       <Route path="/formCoordenadores" element={<FormCoordenadores />} />
       <Route path="/calendar" element={<Calendar />} /> 
+      <Route path="/habilidades" element={<Habilidades />} /> 
+      <Route path="/statusVagas" element={<StatusVagas />} /> 
+      <Route path="/tipoTarefa" element={<TipoTarefa />} /> 
+      <Route path="/unidade" element={<Unidade />} /> 
 
       {/* <Route path="/doaçoesChart" element={<DoaçoesChart />} /> */}
       {/* <Route path="/tarefasChart" element={<TarefasChart />} /> */}

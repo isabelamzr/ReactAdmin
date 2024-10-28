@@ -21,13 +21,11 @@ const Calendar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   
-  // Carregar eventos do Local Storage ao inicializar
   const [currentEvents, setCurrentEvents] = useState(() => {
     const storedEvents = localStorage.getItem("calendarEvents");
     return storedEvents ? JSON.parse(storedEvents) : [];
   });
 
-  // Salvar eventos no Local Storage sempre que houver alterações em currentEvents
   useEffect(() => {
     localStorage.setItem("calendarEvents", JSON.stringify(currentEvents));
   }, [currentEvents]);
@@ -45,16 +43,16 @@ const Calendar = () => {
         end: selected.endStr,
         allDay: selected.allDay,
       };
-      calendarApi.addEvent(newEvent); // Adiciona o evento ao calendário
-      setCurrentEvents((prevEvents) => [...prevEvents, newEvent]); // Atualiza o estado com o novo evento
+      calendarApi.addEvent(newEvent); 
+      setCurrentEvents((prevEvents) => [...prevEvents, newEvent]); 
     }
   };
 
   const handleEventClick = (selected) => {
     if (window.confirm(`Tem certeza que deseja remover o evento? '${selected.event.title}'`)) {
       const eventId = selected.event.id;
-      selected.event.remove(); // Remove o evento do calendário
-      setCurrentEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId)); // Atualiza o estado excluindo o evento
+      selected.event.remove(); 
+      setCurrentEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId)); 
     }
   };
 
@@ -62,7 +60,7 @@ const Calendar = () => {
     <Box m="20px">
       <Header
         title="Calendário"
-        subtitle="Agende e organize as atividades dos voluntários"
+        subtitle="Agende e organize as atividades"
       />
 
       <Box display="flex" justifyContent="space-between">
@@ -105,8 +103,8 @@ const Calendar = () => {
         {/* CALENDAR */}
         <Box flex="1 1 100%" ml="15px">
           <FullCalendar
-            locales={[ptBrLocale]} // Adiciona o idioma português do Brasil
-            locale="pt-BR" // Define como o idioma ativo
+            locales={[ptBrLocale]} 
+            locale="pt-BR" 
             height="75vh"
             plugins={[
               dayGridPlugin,
@@ -126,7 +124,7 @@ const Calendar = () => {
             dayMaxEvents={true}
             select={handleDateClick}
             eventClick={handleEventClick}
-            events={currentEvents} // Usa o estado currentEvents para carregar eventos
+            events={currentEvents} 
           />
         </Box>
       </Box>

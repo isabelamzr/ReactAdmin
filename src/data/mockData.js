@@ -1,5 +1,50 @@
 import { tokens } from "../theme";
 
+export const mockDataStatusVagas = [
+  {
+    id: 1,
+    codigo_status: 0,
+    descricao: "aberta - não divulgando",
+  },
+
+  {
+    id: 2,
+    codigo_status: 1,
+    descricao: "em divulgação",
+  },
+
+  {
+    id: 3,
+    codigo_status: 2,
+    descricao: "cancelada - não divulgando",
+  },
+
+  {
+    id: 4,
+    codigo_status: 3,
+    descricao: "completa - não divulgando",
+  },
+]
+
+export const mockDataTipoTarefa = [
+  {
+    id: 1,
+    nome_tarefa: "Bazar",
+    descricao: "Venda de artigos usados, recebidos em doação em espaço e em dias e horários definidos em cada unidade",
+  },
+
+  {
+    id: 2,
+    nome_tarefa: "Mocidade",
+    descricao: "Evangelização Espírita-Cristã a luz da codificação espírita para jovens acima de 12 anos",
+  },
+
+  {
+    id: 3,
+    nome_tarefa: "Campanha do Quilo",
+    descricao: "Angariar donativos, ajustar nossa percepção sobre a caridade",
+  },
+]
 
 export const mockDataHabilidades = [
   {
