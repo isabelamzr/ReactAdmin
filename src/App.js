@@ -12,9 +12,9 @@ import Vagas from "./scenes/vagas";
 import FormVagas from "./scenes/formVagas";
 import FormVoluntarios from "./scenes/formVoluntarios";
 import FormCoordenadores from './scenes/formCoordenadores/index.jsx';
+import Calendar from "./scenes/calendar"
 
 
-// import Calendar from "./scenes/calendar"
 // import DoaçoesChart from "./scenes/doaçoeschart";
 
 
@@ -41,11 +41,11 @@ function App() {
       <Route path="/formVagas" element={<FormVagas />} /> 
       <Route path="/formVoluntarios" element={<FormVoluntarios />} />
       <Route path="/formCoordenadores" element={<FormCoordenadores />} />
-
+      <Route path="/calendar" element={<Calendar />} /> 
 
       {/* <Route path="/doaçoesChart" element={<DoaçoesChart />} /> */}
       {/* <Route path="/tarefasChart" element={<TarefasChart />} /> */}
-      {/* <Route path="/calendar" element={<Calendar />} /> */}
+   
 
     </Routes>
 

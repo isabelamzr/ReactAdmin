@@ -1,5 +1,6 @@
 import { tokens } from "../theme";
 
+
 export const mockDataHabilidades = [
   {
     id: 1,
