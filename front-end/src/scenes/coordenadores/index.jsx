@@ -1,20 +1,33 @@
-import React, { useState } from "react";
+// coordenadores index.jsx
+
+import React, { useState, useEffect } from "react";
 import { Box, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
-import { mockDataCoordenadores } from "../../data/mockData";
 import Header from "../../components/Header";
 
 const Coordenadores = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [coordenadores, setCoordenadores] = useState(mockDataCoordenadores);
-
+  const [coordenadores, setCoordenadores] = useState([]);
   const [coordenadoresDeletados, setCoordenadoresDeletados] = useState([]);
-
   const [selectedRows, setSelectedRows] = useState([]);
+
+  useEffect(() => {
+    const fetchCoordenadores = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/coordenadores/read");
+        if (!response.ok) throw new Error("Erro na conexão com o back-end.");
+        const data = await response.json();
+        setCoordenadores(data);
+      } catch (error) {
+        console.error("Erro ao buscar coordenadores:", error);
+      }
+    };
+    fetchCoordenadores();
+  }, []);
 
   const handleDelete = () => {
     if (selectedRows.length > 0) {
@@ -25,13 +38,10 @@ const Coordenadores = () => {
       const deletados = coordenadores.filter((coordenador) =>
         selectedRows.includes(coordenador.id)
       );
+      
       setCoordenadoresDeletados(deletados);
-
-    
       setCoordenadores(remainingCoordenadores);
-
       setSelectedRows([]);
-
       console.log("Deletados:", deletados);
     }
   };

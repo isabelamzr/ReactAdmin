@@ -1,10 +1,12 @@
+//formCoordenadores index.jsx
+
+import { useEffect , useState } from "react";
 import { Box, Button, TextField, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import { mockDataTarefas } from "../../data/mockData";
+
 
 const initialValues = {
   nome: "",
@@ -20,17 +22,17 @@ const phoneRegExp =
 const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const checkoutSchema = yup.object().shape({
-  nome: yup.string().required("required"),
+  nome: yup.string().required("Campo obrigatório"),
   telefone: yup
     .string()
-    .matches(phoneRegExp, "Phone number is not valid")
-    .required("required"),
+    .matches(phoneRegExp, "Este número é inválido")
+    .required("Campo obrigatório"),
   email: yup
     .string()
-    .matches(emailRegExp, "Email is not valid")
+    .matches(emailRegExp, "Este e-mail é inválido")
     .required("required"),
-  genero: yup.string().required("required"),
-  tarefa: yup.string().required("required"),
+  genero: yup.string().required("Campo obrigatório"),
+  tarefa: yup.string().required("Campo obrigatório"),
 });
 
 const FormCoordenadores = () => {
@@ -38,12 +40,42 @@ const FormCoordenadores = () => {
   const [tarefas, setTarefas] = useState([]);
 
   useEffect(() => {
-    const tiposTarefas = [...new Set(mockDataTarefas.map((tarefa) => tarefa.tipo_tarefa_id))];
-    setTarefas(tiposTarefas);
+    const fetchTarefas = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/tarefas");
+        if (!response.ok) throw new Error("Erro ao buscar tarefas");
+        const data = await response.json();
+        setTarefas(data);
+      } catch (error) {
+        console.error("Erro ao buscar tarefas:", error);
+      }
+    };
+    fetchTarefas();
   }, []);
 
-  const handleFormSubmit = (values) => {
-    console.log("Novo coordenador criado:", values);
+  const handleFormSubmit = async (values) => {
+    // Remove o campo tarefa dos dados que serão enviados
+    const { tarefa, ...dadosCoordenador } = values; // Separando tarefa e deixando os outros campos em dadosCoordenador
+    
+    console.log("Enviando dados:", dadosCoordenador); // Verificando os dados após a remoção de tarefa
+  
+    try {
+      const response = await fetch("http://127.0.0.1:5000/coordenadores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dadosCoordenador), // Enviando apenas dadosCoordenador
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+      } else {
+        throw new Error(data.message || "Erro ao criar coordenador");
+      }
+    } catch (error) {
+      console.error("Erro ao criar coordenador:", error);
+      alert("Erro ao criar coordenador");
+  }
   };
 
   return (
@@ -164,5 +196,7 @@ const FormCoordenadores = () => {
     </Box>
   );
 };
+
+
 
 export default FormCoordenadores;

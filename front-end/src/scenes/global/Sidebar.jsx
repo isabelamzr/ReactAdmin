@@ -211,7 +211,7 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Coordenadores"
+              title="Add Coordenadores"
               to="/formCoordenadores"
               icon={<GroupAddIcon />}
               selected={selected}

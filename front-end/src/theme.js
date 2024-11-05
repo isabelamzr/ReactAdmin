@@ -148,7 +148,8 @@ export const themeSettings = (mode) => {
                     },
                     background: {
                         default: colors.primary[500],
-                    }
+                    },
+                  
                 } : {
                     primary: {
                         main: colors.primary[100],
@@ -163,7 +164,8 @@ export const themeSettings = (mode) => {
                     },
                     background: {
                         default: "#fcfcfc",
-                    },  
+                    },
+                    
                 }),
         },
         typography: {
