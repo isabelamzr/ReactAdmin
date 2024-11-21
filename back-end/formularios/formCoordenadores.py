@@ -6,12 +6,11 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 
-load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Habilita o CORS, se necessário
 
-# Função para conexão com o banco de dados MySQL
+
 def conectar_db():
     try:
         return mysql.connector.connect(
@@ -20,16 +19,15 @@ def conectar_db():
             password=os.getenv("DB_PWD"), 
             database=os.getenv("DB_NAME")
         )
+    
     except mysql.connector.Error as err:
         print(f"Erro ao conectar ao banco de dados: {err}")
         return None  
 
-# Rota para criar um coordenador
-@app.route('/coordenadores', methods=['POST'])
 
 def criar_coordenador(conexao, dados):
     dados = request.json
-    print("Dados recebidos:", dados)  # Log dos dados recebidos
+    print("Dados recebidos:", dados) 
     conexao = conectar_db()
     if not conexao:
         return jsonify({"message": "Erro ao conectar ao banco"}), 500
@@ -42,16 +40,17 @@ def criar_coordenador(conexao, dados):
         cursor.execute(query, valores)
         conexao.commit()
         return jsonify({"message": "Coordenador criado com sucesso!"}), 201
+    
     except Exception as e:
         print(f"Erro ao inserir coordenador: {e}")
         raise
-        # return jsonify({"message": "Erro ao criar coordenador"}), 500
+        # return jsonify({"message": "Erro ao criar coordenador: {str(e)}"}), 500
         
     finally:
         cursor.close()
         conexao.close()
 
-@app.route('/coordenadores/read', methods=['GET'])
+
 def obter_coordenadores(conexao):
     conexao = conectar_db()
     if conexao is None:
@@ -60,7 +59,7 @@ def obter_coordenadores(conexao):
 
     try:
         cursor = conexao.cursor(dictionary=True)
-        query = "SELECT * FROM coordenador"
+        query = "SELECT * FROM coordenador WHERE ativo = 1"
         cursor.execute(query)
         resultado = cursor.fetchall()
         print("Dados recuperados:", resultado)  # Log para verificar os dados retornados
@@ -73,8 +72,7 @@ def obter_coordenadores(conexao):
         cursor.close()
         conexao.close()
 
-# Rota para atualizar um coordenador
-@app.route('/coordenadores/update/<int:id>', methods=['PUT'])
+
 def atualizar_coordenador(id):
     dados = request.json
     conexao = conectar_db()
@@ -96,29 +94,104 @@ def atualizar_coordenador(id):
         cursor.close()
         conexao.close()
 
-# Rota para deletar um coordenador
-@app.route('/coordenadores/delete/<int:id>', methods=['DELETE'])
-def deletar_coordenador(id):
+
+def soft_delete_coordenador(id):
     conexao = conectar_db()
     if not conexao:
         return jsonify({"message": "Erro ao conectar ao banco"}), 500
 
     cursor = conexao.cursor()
-    query = "DELETE FROM coordenador WHERE id = %s"
+    query = "UPDATE coordenador SET ativo = 0 WHERE id = %s"
 
     try:
         cursor.execute(query, (id,))
         conexao.commit()
-        return jsonify({"message": "Coordenador deletado com sucesso!"})
+        return jsonify({"message": "Coordenador marcado como excluído com sucesso!"}), 200
+    
     except Exception as e:
-        print(f"Erro ao deletar coordenador: {e}")
-        return jsonify({"message": "Erro ao deletar coordenador"}), 500
+        print(f"Erro ao marcar coordenador como excluído: {e}")
+        return jsonify({"message": "Erro ao marcar coordenador como excluído"}), 500
+    
     finally:
         cursor.close()
         conexao.close()
 
-# Rota para obter tarefas para o dropdown de tarefas
-@app.route('/tarefas', methods=['GET'])
+
+
+
+
+def listar_coordenadores(conexao):
+    try:
+        with conexao.cursor(dictionary=True) as cursor:
+            query = "SELECT * FROM coordenador"
+            cursor.execute(query)
+            return cursor.fetchall()
+    except Exception as e:
+        raise ValueError(f"Erro ao listar coordenadores: {e}")
+
+def listar_coordenadores_inativos(conexao):
+    try:
+        with conexao.cursor(dictionary=True) as cursor:
+            query = "SELECT * FROM coordenador WHERE ativo = 0"  # Corrigido para o nome correto da tabela
+            cursor.execute(query)
+            coordenadores_inativos = cursor.fetchall()
+            print(f"Coordenadores inativos encontrados: {coordenadores_inativos}")
+            return coordenadores_inativos
+    except Exception as e:
+        raise ValueError(f"Erro ao listar coordenadores inativos: {e}")
+
+# def listar_coordenadores_inativos(conexao):
+#     try:
+#         with conexao.cursor(dictionary=True) as cursor:
+#             query = "SELECT * FROM coordenador WHERE ativo = 0"
+#             cursor.execute(query)
+#             return cursor.fetchall()
+#     except Exception as e:
+#         raise ValueError(f"Erro ao listar coordenadores inativos: {e}")
+
+
+
+def restaurar_coordenador(id, conexao):
+    if not conexao:
+        raise ValueError("Erro ao conectar ao banco de dados.")
+    
+    cursor = conexao.cursor()
+    query = "UPDATE coordenador SET ativo = 1 WHERE id = %s"
+
+    try:
+        cursor.execute(query, (id,))
+        conexao.commit()
+    except Exception as e:
+        raise RuntimeError(f"Erro ao restaurar coordenador: {e}")
+    finally:
+     cursor.close()
+
+
+
+
+
+# def restaurar_coordenador(id):
+#     conexao = conectar_db()
+#     if not conexao:
+#         return jsonify({"message": "Erro ao conectar ao banco"}), 500
+
+#     cursor = conexao.cursor()
+#     query = "UPDATE coordenador SET ativo = 1 WHERE id = %s"
+
+#     try:
+#         cursor.execute(query, (id,))
+#         conexao.commit()
+#         return jsonify({"message": "Coordenador restaurado com sucesso!"}), 200
+    
+#     except Exception as e:
+#         print(f"Erro ao restaurar coordenador: {e}")
+#         return jsonify({"message": "Erro ao restaurar coordenador"}), 500
+    
+#     finally:
+#         cursor.close()
+#         conexao.close()
+
+
 def get_tarefas():
     conexao = conectar_db()
     if conexao is None:
@@ -130,7 +203,6 @@ def get_tarefas():
         cursor.execute(query)
         tarefas = cursor.fetchall()
 
-        # Retorna apenas os nomes das tarefas
         return jsonify([tarefa['nome_tarefa'] for tarefa in tarefas])
     except Exception as e:
         print(f"Erro ao buscar tarefas: {e}")
@@ -139,6 +211,5 @@ def get_tarefas():
         cursor.close()
         conexao.close()
 
-# Iniciar o aplicativo Flask
 if __name__ == '__main__':
     app.run(debug=True)

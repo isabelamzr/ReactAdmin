@@ -42,7 +42,7 @@ const FormCoordenadores = () => {
   useEffect(() => {
     const fetchTarefas = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/tarefas");
+        const response = await fetch("http://localhost:5000/tarefas");
         if (!response.ok) throw new Error("Erro ao buscar tarefas");
         const data = await response.json();
         setTarefas(data);
@@ -60,7 +60,7 @@ const FormCoordenadores = () => {
     console.log("Enviando dados:", dadosCoordenador); // Verificando os dados após a remoção de tarefa
   
     try {
-      const response = await fetch("http://127.0.0.1:5000/coordenadores", {
+      const response = await fetch("http://localhost:5000/coordenadores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dadosCoordenador), // Enviando apenas dadosCoordenador
