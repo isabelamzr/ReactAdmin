@@ -34,3 +34,18 @@ body,
 ::-webkit-scroll-track:hover {
   background: #555;
 }
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

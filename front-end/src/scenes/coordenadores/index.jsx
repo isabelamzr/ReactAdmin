@@ -6,6 +6,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Coordenadores = () => {
   const theme = useTheme();
@@ -18,7 +19,9 @@ const Coordenadores = () => {
   const [selectedName, setSelectedName] = useState("");
   const [canRestore, setCanRestore] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
-
+  const [deleteMessageVisible, setDeleteMessageVisible] = useState(false);
+  const [restoreMessage, setRestoreMessage] = useState("");
+  const [restoreMessageVisible, setRestoreMessageVisible] = useState(false);
 
 
     const fetchCoordenadores = async () => {
@@ -28,8 +31,7 @@ const Coordenadores = () => {
     
         const data = await response.json();
         console.log("Resposta da API (todos os coordenadores):", data);
-    
-        // Filtrar coordenadores ativos para a tabela principal
+
         setCoordenadores(data.filter((c) => c.ativo === 1));
 
         setSelectedRows([]);
@@ -91,7 +93,11 @@ const Coordenadores = () => {
    }
       fetchCoordenadores();
       setDeleteMessage(`O cadastro de "${selectedName}" foi removido.`); 
-      setTimeout(() => setDeleteMessage(""), 2000);
+      setDeleteMessageVisible(true);
+
+      setTimeout(() => {
+        setDeleteMessageVisible(false);
+      }, 2000);
 
     } catch (error) {
       console.error("Erro ao excluir coordenador:", error);
@@ -118,20 +124,17 @@ const handleRedo = async () => {
   try {
     const response = await fetch(`http://localhost:5000/coordenadores/restaurar/${selectedRows[0]}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Erro ao restaurar coordenador");
-    }
-    
+    if (!response.ok) throw new Error("Erro ao restaurar coordenador");
     fetchCoordenadores();
+    setRestoreMessage(`O cadastro de "${selectedName}" foi restaurado.`);
+    setRestoreMessageVisible(true);
+    setTimeout(() => setRestoreMessageVisible(false), 2000);
   } catch (error) {
     console.error("Erro ao restaurar coordenador:", error);
-}};
+  }
+};
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -151,9 +154,8 @@ const handleRedo = async () => {
   const handleRowSelection = (newSelectionModel) => {
     setSelectedRows(newSelectionModel);
 
-    // Verifique se o coordenador selecionado está marcado como excluído (ativo === 0)
     const selectedCoordenador = coordenadores.find((c) => c.id === newSelectionModel[0]);
-    setCanRestore(selectedCoordenador?.ativo === 0);  // Habilitar o botão "Refazer" se estiver excluído
+    setCanRestore(selectedCoordenador?.ativo === 0);  
   };
 
   return (
@@ -161,24 +163,68 @@ const handleRedo = async () => {
       <Header title="Coordenadores" subtitle="Gerenciamento de Coordenadores Ativos" />
 
       
-      {deleteMessage && (
-  <Box
-    mt={1}
-    mb={1}
-    p={1}
-    borderRadius="5px"
-    textAlign="center"
-    fontWeight="bold"
-    boxShadow={1}
-    sx={{
-      color: theme.palette.mode === "dark" ? colors.grey[100] : colors.grey[900],
-      backgroundColor: theme.palette.mode === "dark" ? colors.redAccent[500] : colors.redAccent[100],
-    }}
-  >
-    {deleteMessage}
-</Box>
-)}
-      
+      <AnimatePresence>
+  {deleteMessageVisible && (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+      style={{
+        marginTop: "10px",
+        padding: "10px 20px",
+        borderRadius: "8px",
+        textAlign: "center",
+        fontWeight: "normal",
+        fontSize: "0.8rem",
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+        maxWidth: "fit-content",
+        margin: "0 auto", 
+        color: theme.palette.mode === "dark" 
+        ? colors.grey[100] 
+        : colors.grey[900],
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? colors.redAccent[500]
+            : colors.redAccent[500], 
+      }}
+    >
+      {deleteMessage}
+    </motion.div>
+  )}
+</AnimatePresence>
+
+
+<AnimatePresence>
+  {restoreMessageVisible && (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+      style={{
+        marginTop: "10px",
+        padding: "10px 20px",
+        borderRadius: "8px",
+        textAlign: "center",
+        fontWeight: "normal", 
+        fontSize: "0.8rem", 
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+        maxWidth: "fit-content", 
+        margin: "0 auto", 
+        color: theme.palette.mode === "dark"
+        ? colors.grey[100] 
+        : colors.grey[900],
+        backgroundColor: theme.palette.mode === "dark" 
+        ? colors.greenAccent[700] 
+        : colors.greenAccent[400],
+       
+      }}
+    >
+      {restoreMessage}
+    </motion.div>
+  )}
+</AnimatePresence>     
 
       <Box
         m="40px 0 0 0"

@@ -116,10 +116,6 @@ def soft_delete_coordenador(id):
         cursor.close()
         conexao.close()
 
-
-
-
-
 def listar_coordenadores(conexao):
     try:
         with conexao.cursor(dictionary=True) as cursor:
@@ -140,17 +136,6 @@ def listar_coordenadores_inativos(conexao):
     except Exception as e:
         raise ValueError(f"Erro ao listar coordenadores inativos: {e}")
 
-# def listar_coordenadores_inativos(conexao):
-#     try:
-#         with conexao.cursor(dictionary=True) as cursor:
-#             query = "SELECT * FROM coordenador WHERE ativo = 0"
-#             cursor.execute(query)
-#             return cursor.fetchall()
-#     except Exception as e:
-#         raise ValueError(f"Erro ao listar coordenadores inativos: {e}")
-
-
-
 def restaurar_coordenador(id, conexao):
     if not conexao:
         raise ValueError("Erro ao conectar ao banco de dados.")
@@ -165,32 +150,6 @@ def restaurar_coordenador(id, conexao):
         raise RuntimeError(f"Erro ao restaurar coordenador: {e}")
     finally:
      cursor.close()
-
-
-
-
-
-# def restaurar_coordenador(id):
-#     conexao = conectar_db()
-#     if not conexao:
-#         return jsonify({"message": "Erro ao conectar ao banco"}), 500
-
-#     cursor = conexao.cursor()
-#     query = "UPDATE coordenador SET ativo = 1 WHERE id = %s"
-
-#     try:
-#         cursor.execute(query, (id,))
-#         conexao.commit()
-#         return jsonify({"message": "Coordenador restaurado com sucesso!"}), 200
-    
-#     except Exception as e:
-#         print(f"Erro ao restaurar coordenador: {e}")
-#         return jsonify({"message": "Erro ao restaurar coordenador"}), 500
-    
-#     finally:
-#         cursor.close()
-#         conexao.close()
-
 
 def get_tarefas():
     conexao = conectar_db()
