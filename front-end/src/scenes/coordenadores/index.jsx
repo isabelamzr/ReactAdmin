@@ -22,6 +22,11 @@ const Coordenadores = () => {
   const [deleteMessageVisible, setDeleteMessageVisible] = useState(false);
   const [restoreMessage, setRestoreMessage] = useState("");
   const [restoreMessageVisible, setRestoreMessageVisible] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [deletedRecords, setDeletedRecords] = useState([]);
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
+  const [permanentDeleteId, setPermanentDeleteId] = useState(null);
+  const [confirmDeleteMessage, setConfirmDeleteMessage] = useState("");
 
 
     const fetchCoordenadores = async () => {
@@ -80,29 +85,34 @@ const Coordenadores = () => {
   const handleDelete = async () => {
     setOpenDeleteDialog(false);
     try {
-      const response = await fetch(`http://localhost:5000/coordenadores/soft_delete/${selectedRows[0]}`, 
-      { method: "DELETE",
+      const response = await fetch(`http://localhost:5000/coordenadores/soft_delete/${selectedRows[0]}`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-       });
-     
+      });
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Erro ao excluir coordenador");
-   }
-      fetchCoordenadores();
-      setDeleteMessage(`O cadastro de "${selectedName}" foi removido.`); 
+      }
+  
+      // Atualiza os registros ativos e inativos
+      await fetchCoordenadores();
+      await fetchDeletedRecords();
+  
+      // Exibe mensagem de sucesso
+      setDeleteMessage(`O cadastro de "${selectedName}" foi removido.`);
       setDeleteMessageVisible(true);
-
+  
       setTimeout(() => {
         setDeleteMessageVisible(false);
       }, 2000);
-
     } catch (error) {
       console.error("Erro ao excluir coordenador:", error);
     }
   };
+  
 
   const handleOpenRestoreDialog = async () => {
     try {
@@ -119,22 +129,113 @@ const Coordenadores = () => {
       console.error("Erro ao buscar coordenador inativo:", error);
 }};
   
-const handleRedo = async () => {
+
+const handleRedo = async (id) => {
   setOpenRestoreDialog(false);
   try {
-    const response = await fetch(`http://localhost:5000/coordenadores/restaurar/${selectedRows[0]}`, {
+
+    const coordenadorToRestore = deletedRecords.find(record => record.id === id);
+    const nameToRestore = coordenadorToRestore?.nome || "Coordenador";
+
+    const response = await fetch(`http://localhost:5000/coordenadores/restaurar/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
-    if (!response.ok) throw new Error("Erro ao restaurar coordenador");
-    fetchCoordenadores();
-    setRestoreMessage(`O cadastro de "${selectedName}" foi restaurado.`);
+
+    if (!response.ok) {
+      throw new Error("Erro ao restaurar coordenador");
+    }
+
+    // Atualiza os registros ativos e inativos
+    await fetchCoordenadores();
+    await fetchDeletedRecords();
+
+    // Exibe mensagem de sucesso
+    setRestoreMessage(`O cadastro de "${nameToRestore}" foi restaurado com sucesso.`);
     setRestoreMessageVisible(true);
-    setTimeout(() => setRestoreMessageVisible(false), 2000);
+
+    setTimeout(() => {
+      setRestoreMessageVisible(false);
+    }, 2000);
   } catch (error) {
     console.error("Erro ao restaurar coordenador:", error);
   }
 };
+
+
+const fetchDeletedRecords = async () => {
+  try {
+    const response = await fetch("http://localhost:5000/coordenadores/inativos");
+    const data = await response.json();
+    console.log("Registros inativos recebidos:", data); // Debug
+    setDeletedRecords(data);
+  } catch (error) {
+    console.error("Erro ao buscar registros inativos:", error);
+  }
+};
+
+
+const handlePermanentDelete = async () => {
+  try {
+    if (!permanentDeleteId) {
+      console.error("ID do coordenador não fornecido");
+      return;
+    }
+
+    const coordenadorToDelete = deletedRecords.find(record => record.id === permanentDeleteId);
+    const nameToDelete = coordenadorToDelete?.nome || "Coordenador";
+
+    console.log(`Tentando excluir coordenador ID: ${permanentDeleteId}`); // Log para debug
+
+    const response = await fetch(`http://localhost:5000/coordenadores/delete/${permanentDeleteId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log("Resposta da API:", data); // Log para debug
+
+    if (!response.ok) {
+      throw new Error(data.error || "Erro ao excluir permanentemente o cadastro");
+    }
+
+    // Atualiza os registros
+    await fetchDeletedRecords();
+    
+    // Mensagem de sucesso
+    setDeleteMessage(`O cadastro de "${nameToDelete}" foi excluído permanentemente do banco de dados.`);
+    setDeleteMessageVisible(true);
+    
+    setTimeout(() => {
+      setDeleteMessageVisible(false);
+    }, 2000);
+
+    setConfirmDeleteDialog(false);
+    setPermanentDeleteId(null);
+    
+  } catch (error) {
+    console.error("Erro detalhado ao excluir permanentemente:", error);
+    
+    // Mensagem de erro mais específica
+    setDeleteMessage(`Erro ao excluir: ${error.message}`);
+    setDeleteMessageVisible(true);
+    
+    setTimeout(() => {
+      setDeleteMessageVisible(false);
+    }, 3000);
+}
+};    
+
+
+const handleOpenHistory = async () => {
+  await fetchDeletedRecords(); // Atualiza os registros inativos
+  setShowHistory(true); // Exibe o modal
+};
+
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -163,6 +264,8 @@ const handleRedo = async () => {
       <Header title="Coordenadores" subtitle="Gerenciamento de Coordenadores Ativos" />
 
       
+    {/* Mensagem de deletar/refazer bem sucedidos */}
+
       <AnimatePresence>
   {deleteMessageVisible && (
     <motion.div
@@ -226,6 +329,9 @@ const handleRedo = async () => {
   )}
 </AnimatePresence>     
 
+      
+    {/* Tabela */}
+      
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -276,6 +382,75 @@ const handleRedo = async () => {
         />
       </Box>
 
+        {/* Modal Histórico de exclusão */}
+
+      <Dialog open={showHistory} onClose={() => setShowHistory(false)} maxWidth="sm" fullWidth>
+      <DialogTitle>Histórico de Exclusões</DialogTitle>
+      <DialogContent>
+        <Box sx={{ maxHeight: "50vh", overflowY: "auto" }}>
+          {deletedRecords.length > 0 ? (
+            deletedRecords.map((record) => (
+              <Box
+                key={record.id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "10px",
+                  borderBottom: `1px solid ${colors.grey[700]}`,
+                }}
+              >
+                <span>{record.nome}</span>
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ marginRight: "10px" }}
+                    onClick={() => handleRedo(record.id)}
+                  >
+                    Restaurar
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => {
+                      setConfirmDeleteDialog(true);
+                      setPermanentDeleteId(record.id);
+                      setConfirmDeleteMessage(`Esse cadastro será excluído permanentemente do banco de dados. Deseja continuar com a exclusão de ${record.nome}?`);
+                    }}
+                  >
+                    Deletar
+                  </Button>
+                </Box>
+              </Box>
+            ))
+          ) : (
+            <span>Nenhum registro encontrado.</span>
+          )}
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setShowHistory(false)} color="primary">
+          Fechar
+        </Button>
+      </DialogActions>
+    </Dialog>
+
+      
+    {/* Mensagens de confirmação de histórico/deletar/refazer */}
+
+      <Dialog open={confirmDeleteDialog} onClose={() => setConfirmDeleteDialog(false)}>
+        <DialogTitle>Confirmar Exclusão Permanente</DialogTitle>
+        <DialogContent>
+        <DialogContentText>{confirmDeleteMessage}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setConfirmDeleteDialog(false)}>Cancelar</Button>
+        <Button onClick={handlePermanentDelete} color="error">Excluir</Button>
+      </DialogActions>
+    </Dialog>
+
+
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
         <DialogTitle>Confirmar Exclusão</DialogTitle>
         <DialogContent>
@@ -297,6 +472,23 @@ const handleRedo = async () => {
           <Button onClick={handleRedo} color="success">Restaurar</Button>
         </DialogActions>
       </Dialog>
+
+    {/* Botões de histórico/deletar/refazer */}
+
+          <Button
+        onClick={handleOpenHistory}
+        sx={{
+          marginLeft: "10px",
+          textTransform: "none",
+          color: colors.blueAccent[700],
+          "&:hover": {
+            textDecoration: "underline",
+          },
+        }}
+      >
+        Mostrar histórico de exclusão
+      </Button>
+
 
       <Box display="flex" justifyContent="end" mt="20px">
         <Button

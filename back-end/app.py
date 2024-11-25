@@ -7,15 +7,17 @@ from formularios.formCoordenadores import (
     obter_coordenadores,
     atualizar_coordenador,
     soft_delete_coordenador,
+    excluir_coordenador_permanente,
     restaurar_coordenador,
     listar_coordenadores_inativos,
     conectar_db
 )
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}}) 
+CORS(app) 
 
-# , resources={r"/*":{"origins": "http://localhost:3000"}}
+# resources={r"/*": {"origins": "*"}}
+
 
 @app.route('/coordenadores', methods=['POST'])
 
@@ -74,6 +76,27 @@ def api_soft_delete_coordenador(id):
     except Exception as e:
         print(f"Erro ao excluir coordenador: {e}")
         return jsonify({"message": "Erro ao excluir coordenador"}), 500
+    
+
+@app.route('/coordenadores/delete/<int:id>', methods=['DELETE'])
+def api_excluir_permanente(id):
+    conexao = None
+    try:
+        print(f"Iniciando exclusão permanente do coordenador ID: {id}")  # Log para debug
+        conexao = conectar_db()
+        excluir_coordenador_permanente(conexao, id)
+        return jsonify({"message": "Coordenador excluído permanentemente!", "status": "success"}), 200
+    except ValueError as ve:
+        print(f"Erro de validação: {str(ve)}")  # Log para debug
+        return jsonify({"error": str(ve), "status": "validation_error"}), 400
+    except Exception as e:
+        print(f"Erro interno: {str(e)}")  # Log para debug
+        return jsonify({"error": "Erro interno ao excluir coordenador", "details": str(e), "status": "error"}), 500
+    finally:
+        if conexao:
+            conexao.close()
+            print("Conexão fechada")  # Log para debug
+
 
 @app.route('/coordenadores/inativos', methods=['GET'])
 def listar_coordenadores_inativos_route():

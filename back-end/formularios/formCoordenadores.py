@@ -116,6 +116,30 @@ def soft_delete_coordenador(id):
         cursor.close()
         conexao.close()
 
+def excluir_coordenador_permanente(conexao, id):
+    try:
+        print(f"Tentando excluir coordenador ID: {id}")  # Log para debug
+        with conexao.cursor() as cursor:
+            # Primeiro verifica se o coordenador existe
+            cursor.execute("SELECT id FROM coordenador WHERE id = %s", (id,))
+            if not cursor.fetchone():
+                raise ValueError(f"Coordenador com ID {id} não encontrado")
+            
+            # Tenta realizar a exclusão
+            cursor.execute("DELETE FROM coordenador WHERE id = %s", (id,))
+            rows_affected = cursor.rowcount
+            
+            if rows_affected == 0:
+                raise ValueError(f"Nenhum registro foi excluído para o ID {id}")
+            
+            conexao.commit()
+            print(f"Coordenador ID {id} excluído com sucesso")  # Log para debug
+            return True
+    except Exception as e:
+        print(f"Erro detalhado ao excluir coordenador: {str(e)}")  # Log detalhado do erro
+        conexao.rollback()  # Garante rollback em caso de erro
+        raise
+
 def listar_coordenadores(conexao):
     try:
         with conexao.cursor(dictionary=True) as cursor:
@@ -169,6 +193,7 @@ def get_tarefas():
     finally:
         cursor.close()
         conexao.close()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
