@@ -1,12 +1,32 @@
 // coordenadores index.jsx
 
 import React, { useState, useEffect } from "react";
-import { Box, Button, useTheme, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Box, Button, useTheme, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import { AnimatePresence, motion } from "framer-motion";
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import * as yup from 'yup';
+import { Formik } from 'formik';
+
+
+const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)?[0-9]{4,5}[-]?[0-9]{4}$/;
+const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const checkoutSchema = yup.object().shape({
+  nome: yup.string().required("Campo obrigatório"),
+  telefone: yup
+    .string()
+    .matches(phoneRegExp, "Este número é inválido")
+    .required("Campo obrigatório"),
+  email: yup
+    .string()
+    .matches(emailRegExp, "Este e-mail é inválido")
+    .required("Campo obrigatório"),
+  genero: yup.string().required("Campo obrigatório"),
+});
 
 const Coordenadores = () => {
   const theme = useTheme();
@@ -27,6 +47,10 @@ const Coordenadores = () => {
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
   const [permanentDeleteId, setPermanentDeleteId] = useState(null);
   const [confirmDeleteMessage, setConfirmDeleteMessage] = useState("");
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedCoordenador, setSelectedCoordenador] = useState(null);
+  const [editMessage, setEditMessage] = useState("");
+  const [editMessageVisible, setEditMessageVisible] = useState(false);
 
 
     const fetchCoordenadores = async () => {
@@ -54,6 +78,8 @@ const Coordenadores = () => {
         console.error("Erro ao verificar inativos:", error);
   }};
     
+  // use effects repetitivos inativos e coordenadores fetchcoordenadores? 
+
     useEffect(() => {
     fetchCoordenadores();
     checkInativos();
@@ -101,7 +127,6 @@ const Coordenadores = () => {
       await fetchCoordenadores();
       await fetchDeletedRecords();
   
-      // Exibe mensagem de sucesso
       setDeleteMessage(`O cadastro de "${selectedName}" foi removido.`);
       setDeleteMessageVisible(true);
   
@@ -135,7 +160,7 @@ const handleRedo = async (id) => {
   try {
 
     const coordenadorToRestore = deletedRecords.find(record => record.id === id);
-    const nameToRestore = coordenadorToRestore?.nome || "Coordenador";
+    const nameToRestore = coordenadorToRestore?.nome || "Coordenador";
 
     const response = await fetch(`http://localhost:5000/coordenadores/restaurar/${id}`, {
       method: "PUT",
@@ -152,7 +177,6 @@ const handleRedo = async (id) => {
     await fetchCoordenadores();
     await fetchDeletedRecords();
 
-    // Exibe mensagem de sucesso
     setRestoreMessage(`O cadastro de "${nameToRestore}" foi restaurado com sucesso.`);
     setRestoreMessageVisible(true);
 
@@ -187,7 +211,7 @@ const handlePermanentDelete = async () => {
     const coordenadorToDelete = deletedRecords.find(record => record.id === permanentDeleteId);
     const nameToDelete = coordenadorToDelete?.nome || "Coordenador";
 
-    console.log(`Tentando excluir coordenador ID: ${permanentDeleteId}`); // Log para debug
+    console.log(`Tentando excluir coordenador ID: ${permanentDeleteId}`); 
 
     const response = await fetch(`http://localhost:5000/coordenadores/delete/${permanentDeleteId}`, {
       method: "DELETE",
@@ -197,7 +221,7 @@ const handlePermanentDelete = async () => {
     });
 
     const data = await response.json();
-    console.log("Resposta da API:", data); // Log para debug
+    console.log("Resposta da API:", data); 
 
     if (!response.ok) {
       throw new Error(data.error || "Erro ao excluir permanentemente o cadastro");
@@ -206,7 +230,6 @@ const handlePermanentDelete = async () => {
     // Atualiza os registros
     await fetchDeletedRecords();
     
-    // Mensagem de sucesso
     setDeleteMessage(`O cadastro de "${nameToDelete}" foi excluído permanentemente do banco de dados.`);
     setDeleteMessageVisible(true);
     
@@ -230,12 +253,57 @@ const handlePermanentDelete = async () => {
 }
 };    
 
-
 const handleOpenHistory = async () => {
   await fetchDeletedRecords(); // Atualiza os registros inativos
   setShowHistory(true); // Exibe o modal
 };
 
+const handleOpenEditDialog = (coordenador) => {
+  setSelectedCoordenador(coordenador);
+  setOpenEditDialog(true);
+};
+
+const handleEditSubmit = async (values, { setSubmitting }) => {
+  try {
+
+    const response = await fetch(`http://localhost:5000/coordenadores/update/${selectedCoordenador.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nome: values.nome,
+        telefone: values.telefone, 
+        email: values.email,
+        genero: values.genero
+      })
+    });
+
+    console.log("Resposta do servidor:", response);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.log("Erro detalhado:", errorData); // Verifique o erro detalhado
+      throw new Error(errorData.error || "Erro ao atualizar coordenador");
+    }
+
+    // Atualiza os registros
+    await fetchCoordenadores();
+
+    // Mensagem de sucesso
+    setEditMessage(`Cadastro de "${values.nome}" atualizado com sucesso.`);
+    setEditMessageVisible(true);
+    
+    setTimeout(() => {
+      setEditMessageVisible(false);
+    }, 2000);
+
+    setOpenEditDialog(false);
+  } catch (error) {
+    console.error("Erro ao editar coordenador:", error);
+  } finally {
+    setSubmitting(false);
+}};
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -243,7 +311,23 @@ const handleOpenHistory = async () => {
     { field: "telefone", headerName: "Telefone", flex: 1 },
     { field: "email", headerName: "E-mail", flex: 1 },
     { field: "genero", headerName: "Gênero", flex: 1 },
-  ];
+    {
+      field: "actions",
+      headerName: "Editar",
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <DriveFileRenameOutlineIcon 
+          onClick={() => handleOpenEditDialog(params.row)}
+          sx={{ 
+            cursor: 'pointer', 
+            color: colors.greenAccent[400],
+            '&:hover': { color: colors.greenAccent[300] }
+          }}
+        />
+      ),
+      width: 100
+}]; 
 
   const customLocaleText = {
     ...ptBR.components.MuiDataGrid.defaultProps.localeText,
@@ -263,8 +347,106 @@ const handleOpenHistory = async () => {
     <Box m="20px">
       <Header title="Coordenadores" subtitle="Gerenciamento de Coordenadores Ativos" />
 
+      {/* edit  */}
+
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Editar Coordenador</DialogTitle>
+        <DialogContent>
+          <Formik
+            onSubmit={handleEditSubmit}
+            initialValues={{
+              nome: selectedCoordenador?.nome || '',
+              telefone: selectedCoordenador?.telefone || '',
+              email: selectedCoordenador?.email || '',
+              genero: selectedCoordenador?.genero || ''
+            }}
+            validationSchema={checkoutSchema}
+          >
+            {({ 
+              values, 
+              errors, 
+              touched, 
+              handleBlur, 
+              handleChange, 
+              handleSubmit,
+              isSubmitting 
+            }) => (
+              <form onSubmit={handleSubmit}>
+                <Box display="grid" gap="30px" gridTemplateColumns="repeat(4, minmax(0, 1fr))">
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Nome"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.nome}
+                    name="nome"
+                    error={!!touched.nome && !!errors.nome}
+                    helperText={touched.nome && errors.nome}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Telefone"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.telefone}
+                    name="telefone"
+                    error={!!touched.telefone && !!errors.telefone}
+                    helperText={touched.telefone && errors.telefone}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="E-mail"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.email}
+                    name="email"
+                    error={!!touched.email && !!errors.email}
+                    helperText={touched.email && errors.email}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Gênero"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.genero}
+                    name="genero"
+                    error={!!touched.genero && !!errors.genero}
+                    helperText={touched.genero && errors.genero}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+                </Box>
+                <DialogActions>
+                  <Button onClick={() => setOpenEditDialog(false)} color="secondary">
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    color="primary" 
+                    variant="contained"
+                    disabled={isSubmitting}
+                  >
+                    Salvar
+                  </Button>
+                </DialogActions>
+              </form>
+            )}
+          </Formik>
+        </DialogContent>
+    </Dialog>
+
       
-    {/* Mensagem de deletar/refazer bem sucedidos */}
+    {/* Mensagem de deletar/refazer/editar bem sucedidos */}
 
       <AnimatePresence>
   {deleteMessageVisible && (
@@ -329,7 +511,37 @@ const handleOpenHistory = async () => {
   )}
 </AnimatePresence>     
 
-      
+<AnimatePresence>
+        {editMessageVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            style={{
+              marginTop: "10px",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              textAlign: "center",
+              fontWeight: "normal",
+              fontSize: "0.8rem",
+              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+              maxWidth: "fit-content",
+              margin: "0 auto", 
+              color: theme.palette.mode === "dark" 
+                ? colors.grey[100] 
+                : colors.grey[900],
+              backgroundColor: theme.palette.mode === "dark"
+                ? colors.greenAccent[700] 
+                : colors.greenAccent[400],
+            }}
+          >
+            {editMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
     {/* Tabela */}
       
       <Box
@@ -526,7 +738,7 @@ const handleOpenHistory = async () => {
 
       </Box>
     </Box>
-  );
+);
 };
 
 export default Coordenadores;

@@ -1,5 +1,8 @@
 # app.py
 
+import mysql.connector
+import re
+import os 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from formularios.formCoordenadores import (
@@ -18,6 +21,87 @@ CORS(app)
 
 # resources={r"/*": {"origins": "*"}}
 
+def get_db_connection():
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PWD"), 
+            database=os.getenv("DB_NAME")
+        )
+        return conn
+    
+    except mysql.connector.Error as err:
+        print(f"Erro ao conectar ao banco de dados: {err}")
+        raise  
+
+@app.route('/coordenadores/update/<int:id>', methods=['PUT'])
+def update_coordenador(id):
+        try:
+            data = request.get_json()
+            
+            # Validações (similares ao create)
+            required_fields = ['nome', 'telefone', 'email', 'genero']
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({"error": f"Campo {field} é obrigatório"}), 400
+            
+            # Regex para validações
+            phone_regex = r'^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)?[0-9]{4,5}[-]?[0-9]{4}$'
+            email_regex = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
+            
+            # Verificações de validação
+            if not re.match(phone_regex, data['telefone']):
+                return jsonify({"error": "Número de telefone inválido"}), 400
+            
+            if not re.match(email_regex, data['email']):
+                return jsonify({"error": "E-mail inválido"}), 400
+            
+            # Conexão com banco de dados
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Query de atualização coordenador
+            query = """
+            UPDATE coordenador
+            SET nome = %s, 
+                telefone = %s, 
+                email = %s, 
+                genero = %s 
+            WHERE id = %s AND ativo = 1
+            """
+            
+            cursor.execute(query, (
+                data['nome'], 
+                data['telefone'], 
+                data['email'], 
+                data['genero'],
+                id
+            ))
+            
+            conn.commit()
+            
+            # Verificar se algum registro foi atualizado
+            if cursor.rowcount == 0:
+                return jsonify({"error": "Coordenador não encontrado ou já inativo"}), 404
+            
+            # Atualizar coordenador_id em todas as tarefas deste coordenador
+            tarefa_query = """
+            UPDATE tarefa
+            SET coordenador_id = %s
+            WHERE coordenador_id = %s
+            """
+            cursor.execute(tarefa_query, (id, id))
+            conn.commit()
+        
+            cursor.close()
+            conn.close()
+            
+            return jsonify({"message": "Coordenador atualizado com sucesso"}), 200
+        
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        
 
 @app.route('/coordenadores', methods=['POST'])
 
@@ -139,9 +223,10 @@ def get_tarefas():
     except Exception as e:
         print(f"Erro ao buscar tarefas: {e}")
         return jsonify({"message": "Erro ao buscar tarefas"}), 500
-        
     
-
+ 
+            
+        
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,19 +1,15 @@
-//formCoordenadores index.jsx
-
-import { useEffect , useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, TextField, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 
-
 const initialValues = {
   nome: "",
   telefone: "",
   email: "",
   genero: "",
-  tarefa: "",
 };
 
 const phoneRegExp =
@@ -32,38 +28,19 @@ const checkoutSchema = yup.object().shape({
     .matches(emailRegExp, "Este e-mail é inválido")
     .required("required"),
   genero: yup.string().required("Campo obrigatório"),
-  tarefa: yup.string().required("Campo obrigatório"),
 });
 
 const FormCoordenadores = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [tarefas, setTarefas] = useState([]);
-
-  useEffect(() => {
-    const fetchTarefas = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/tarefas");
-        if (!response.ok) throw new Error("Erro ao buscar tarefas");
-        const data = await response.json();
-        setTarefas(data);
-      } catch (error) {
-        console.error("Erro ao buscar tarefas:", error);
-      }
-    };
-    fetchTarefas();
-  }, []);
 
   const handleFormSubmit = async (values) => {
-    // Remove o campo tarefa dos dados que serão enviados
-    const { tarefa, ...dadosCoordenador } = values; // Separando tarefa e deixando os outros campos em dadosCoordenador
-    
-    console.log("Enviando dados:", dadosCoordenador); // Verificando os dados após a remoção de tarefa
-  
+      console.log("Enviando dados:", values); 
+
     try {
       const response = await fetch("http://localhost:5000/coordenadores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dadosCoordenador), // Enviando apenas dadosCoordenador
+        body: JSON.stringify(values), 
       });
 
       const data = await response.json();
@@ -75,7 +52,7 @@ const FormCoordenadores = () => {
     } catch (error) {
       console.error("Erro ao criar coordenador:", error);
       alert("Erro ao criar coordenador");
-  }
+    }
   };
 
   return (
@@ -158,29 +135,9 @@ const FormCoordenadores = () => {
                 helperText={touched.genero && errors.genero}
                 sx={{ gridColumn: "span 2" }}
               >
-                {["Mulher Cis", "Homem Cis", "Mulher Transgênero", "Homem Transgênero", "Não-Binário", "Agênero", "Outro"].map((option, index) => (
+                {["Mulher Cis", "Homem Cis", "Mulher Trans", "Homem Trans", "Não-Binário", "Agênero", "Outro"].map((option, index) => (
                   <MenuItem key={index} value={option}>
                     {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                select
-                label="Tarefa"
-                fullWidth
-                variant="filled"
-                name="tarefa"
-                value={values.tarefa}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.tarefa && !!errors.tarefa}
-                helperText={touched.tarefa && errors.tarefa}
-                sx={{ gridColumn: "span 2" }}
-              >
-                {tarefas.map((tarefa, index) => (
-                  <MenuItem key={index} value={tarefa}>
-                    {tarefa}
                   </MenuItem>
                 ))}
               </TextField>
@@ -196,7 +153,5 @@ const FormCoordenadores = () => {
     </Box>
   );
 };
-
-
 
 export default FormCoordenadores;
