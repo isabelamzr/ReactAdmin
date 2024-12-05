@@ -1,5 +1,4 @@
-// formCoordenadores/index.jsx
-
+import React from "react";
 import { Box, Button, TextField, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -26,37 +25,37 @@ const checkoutSchema = yup.object().shape({
   email: yup
     .string()
     .matches(emailRegExp, "Este e-mail é inválido")
-    .required("required"),
+    .required("Campo obrigatório"),
   genero: yup.string().required("Campo obrigatório"),
 });
 
-const FormCoordenadores = () => {
+const AddCoordenador = ({ onClose, onSuccess }) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = async (values) => {
-      console.log("Enviando dados:", values); 
-
+  const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await fetch("http://localhost:5000/coordenadores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values), 
+        body: JSON.stringify(values),
       });
 
       const data = await response.json();
       if (response.ok) {
-        alert(data.message);
+        onSuccess(data.message);
+        onClose();
       } else {
         throw new Error(data.message || "Erro ao criar coordenador");
       }
     } catch (error) {
-      console.error("Erro ao criar coordenador:", error);
-      alert("Erro ao criar coordenador");
+      onSuccess(error.message, "error");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <Box m="20px">
+    <Box p="20px">
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -69,6 +68,7 @@ const FormCoordenadores = () => {
           handleBlur,
           handleChange,
           handleSubmit,
+          isSubmitting,
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
@@ -142,7 +142,12 @@ const FormCoordenadores = () => {
               </TextField>
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button 
+                type="submit" 
+                color="secondary" 
+                variant="contained"
+                disabled={isSubmitting}
+              >
                 Criar Novo Coordenador
               </Button>
             </Box>
@@ -153,4 +158,4 @@ const FormCoordenadores = () => {
   );
 };
 
-export default FormCoordenadores;
+export default AddCoordenador;

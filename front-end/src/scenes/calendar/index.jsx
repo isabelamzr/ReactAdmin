@@ -14,7 +14,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import Header from "../../components/Header";
 import { tokens } from "../../theme";
 
 const Calendar = () => {
@@ -58,11 +57,6 @@ const Calendar = () => {
 
   return (
     <Box m="20px">
-      <Header
-        title="Calendário"
-        subtitle="Agende e organize as atividades"
-      />
-
       <Box display="flex" justifyContent="space-between">
         {/* CALENDAR SIDEBAR */}
         <Box

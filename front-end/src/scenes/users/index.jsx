@@ -5,7 +5,6 @@ import { mockDataUsers } from "../../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import Header from "../../components/Header";
 
 const Users = () => {
 const theme = useTheme();
@@ -77,7 +76,6 @@ const columns = [
 
 return (
 <Box m="20px">
-  <Header title="Usuários" subtitle="Configurações de acesso" />
   <Box
     m="40px 0 0 0" 
     height="75vh" 

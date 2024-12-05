@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import { mockDataVoluntarios } from "../../data/mockData";
-import Header from "../../components/Header";
 
 const Voluntarios = () => {
   const theme = useTheme();
@@ -135,7 +134,6 @@ const Voluntarios = () => {
 
   return (
     <Box m="20px">
-      <Header title="Voluntários" subtitle="Registro de Participantes" />
       <Box
         m="40px 0 0 0"
         height="75vh"

@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import { mockDataUnidade } from "../../data/mockData";
-import Header from "../../components/Header";
 
 const Unidade = () => {
   const theme = useTheme();
@@ -56,7 +55,6 @@ const Unidade = () => {
 
   return (
     <Box m="20px">
-      <Header title="Unidade" subtitle="Gerencie as unidades das associações e seus detalhes" />
       
       <Box
         m="40px 0 0 0"

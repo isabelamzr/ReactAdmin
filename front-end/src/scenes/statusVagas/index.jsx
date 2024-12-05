@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import { mockDataStatusVagas } from "../../data/mockData";
-import Header from "../../components/Header";
 
 const StatusVagas = () => {
   const theme = useTheme();
@@ -52,7 +51,6 @@ const StatusVagas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Status Vagas" subtitle="Gerencie o status das vagas disponíveis" />
       
       <Box
         m="40px 0 0 0"

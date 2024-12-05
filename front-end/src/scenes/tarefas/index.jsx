@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import { mockDataTarefas } from "../../data/mockData";
-import Header from "../../components/Header";
 
 const Tarefas = () => {
   const theme = useTheme();
@@ -12,9 +11,7 @@ const Tarefas = () => {
 
   
   const [tarefas, setTarefas] = useState(mockDataTarefas);
-
   const [tarefasDeletadas, setTarefasDeletadas] = useState([]);
-  
   const [selectedRows, setSelectedRows] = useState([]);
   
   const handleDelete = () => {
@@ -74,7 +71,6 @@ const Tarefas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Tarefas" subtitle="Gerenciador de tarefas" />
       <Box
         m="40px 0 0 0"
         height="75vh"

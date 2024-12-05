@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import { mockDataTipoTarefa } from "../../data/mockData";
-import Header from "../../components/Header";
 
 const TipoTarefas = () => {
   const theme = useTheme();
@@ -52,7 +51,6 @@ const TipoTarefas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Tipo Tarefas" subtitle="Gerencie os tipos de tarefas disponíveis" />
       
       <Box
         m="40px 0 0 0"

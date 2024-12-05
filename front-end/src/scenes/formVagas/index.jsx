@@ -3,7 +3,6 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useState } from "react";
-import Header from "../../components/Header";
 import { mockDataCoordenadores, mockDataUnidade, mockDataTarefas, mockDataVagas } from "../../data/mockData";
 
 const initialValues = {
@@ -75,7 +74,6 @@ const FormVagas = () => {
 
   return (
     <Box m="20px">
-      <Header title="Formulário Vagas" subtitle="Adicionar uma nova vaga" />
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}

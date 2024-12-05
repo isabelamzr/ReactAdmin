@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
 import { tokens } from "../../theme";
 import { mockDataHabilidades } from "../../data/mockData";
-import Header from "../../components/Header";
 
 const Habilidades = () => {
   const theme = useTheme();
@@ -52,7 +51,6 @@ const Habilidades = () => {
 
   return (
     <Box m="20px">
-      <Header title="Habilidades" subtitle="Gerencie as competências e especialidades dos voluntários" />
       
       <Box
         m="40px 0 0 0"
