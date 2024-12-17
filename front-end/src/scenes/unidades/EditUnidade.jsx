@@ -12,36 +12,37 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 
 const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)?[0-9]{4,5}[-]?[0-9]{4}$/;
-const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const checkoutSchema = yup.object().shape({
   nome: yup.string().required("Campo obrigatório"),
   telefone: yup.string()
   .matches(phoneRegExp, "Este número é inválido")
   .required("Campo obrigatório"),
-  email: yup.string()
-    .matches(emailRegExp, "Este e-mail é inválido")
-    .required("Campo obrigatório"),
-  genero: yup.string().required("Campo obrigatório"),
+  endereco: yup.string().required("Campo obrigatório"),
+  bairro: yup.string().required("Campo obrigatório"),
+  cidade: yup.string().required("Campo obrigatório"),
+  uf: yup.string().required("Campo obrigatório"),
 });
 
-const EditCoordenador = ({ 
+const EditUnidade = ({ 
   open, 
   onClose, 
-  coordenador, 
+  unidade, 
   onSubmit 
 }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Editar Coordenador</DialogTitle>
+      <DialogTitle>Editar Unidade</DialogTitle>
       <DialogContent>
         <Formik
           onSubmit={onSubmit}
           initialValues={{
-            nome: coordenador?.nome || '',
-            telefone: coordenador?.telefone || '',
-            email: coordenador?.email || '',
-            genero: coordenador?.genero || ''
+            nome: unidade?.nome || '',
+            telefone: unidade?.telefone || '',
+            endereco: unidade?.endereco || '',
+            bairro: unidade?.bairro || '',
+            cidade: unidade?.cidade || '',
+            uf: unidade?.uf || ''
           }}
           validationSchema={checkoutSchema}
         >
@@ -56,7 +57,7 @@ const EditCoordenador = ({
           }) => (
             <form onSubmit={handleSubmit}>
               <Box display="grid" gap="30px" gridTemplateColumns="repeat(4, minmax(0, 1fr))">
-              <TextField
+                <TextField
                     fullWidth
                     variant="filled"
                     type="text"
@@ -86,26 +87,52 @@ const EditCoordenador = ({
                     fullWidth
                     variant="filled"
                     type="text"
-                    label="E-mail"
+                    label="Endereço"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.email}
-                    name="email"
-                    error={!!touched.email && !!errors.email}
-                    helperText={touched.email && errors.email}
+                    value={values.endereco}
+                    name="endereco"
+                    error={!!touched.endereco && !!errors.endereco}
+                    helperText={touched.endereco && errors.endereco}
                     sx={{ gridColumn: "span 4" }}
                   />
                   <TextField
                     fullWidth
                     variant="filled"
                     type="text"
-                    label="Gênero"
+                    label="Bairro"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.genero}
-                    name="genero"
-                    error={!!touched.genero && !!errors.genero}
-                    helperText={touched.genero && errors.genero}
+                    value={values.bairro}
+                    name="bairro"
+                    error={!!touched.bairro && !!errors.bairro}
+                    helperText={touched.bairro && errors.bairro}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Cidade"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.cidade}
+                    name="cidade"
+                    error={!!touched.cidade && !!errors.cidade}
+                    helperText={touched.cidade && errors.cidade}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="UF"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.uf}
+                    name="uf"
+                    error={!!touched.uf && !!errors.uf}
+                    helperText={touched.uf && errors.uf}
                     sx={{ gridColumn: "span 4" }}
                   />
               </Box>
@@ -131,4 +158,4 @@ const EditCoordenador = ({
   );
 };
 
-export default EditCoordenador;
+export default EditUnidade;

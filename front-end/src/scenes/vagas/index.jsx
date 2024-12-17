@@ -1,200 +1,273 @@
-import React, { useState } from "react";
-import { Box, Button, useTheme } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { ptBR } from "@mui/x-data-grid/locales";
+import React, { useState, useEffect } from "react";
+import { Box, Button, Typography, Dialog, DialogContent } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
-import { mockDataVagas } from "../../data/mockData";
+
+// Importações dos componentes
+import DeleteHistoryModal from "./DeleteHistoryModal";
+import EditVaga from "./EditVaga";
+import MessageNotification from "./MessageNotification";
+import TableVagas from "./TableVagas";
+import AddVaga from "./AddVaga";
 
 const Vagas = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  const [vagas, setVagas] = useState(mockDataVagas);
-
-  const [vagasDeletadas, setVagasDeletadas] = useState([]);
-
+  const URL_KEY = "http://localhost:5000/vagas";
+ 
+  // Estados
+  const [vagas, setVagas] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [deletedRecords, setDeletedRecords] = useState([]);
+  const [canRestore, setCanRestore] = useState(false);
 
-  const handleDelete = () => {
-    if (selectedRows.length > 0) {
-      const remainingVagas = vagas.filter(
-        (vaga) => !selectedRows.includes(vaga.id)
-      );
+  // Estados para modais e mensagens
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openHistoryModal, setOpenHistoryModal] = useState(false);
+  const [selectedVaga, setSelectedVaga] = useState(null);
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  
+  // Estados de mensagens
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
+  const [messageVisible, setMessageVisible] = useState(false);
 
-      const deletadas = vagas.filter((vaga) =>
-        selectedRows.includes(vaga.id)
-      );
-      setVagasDeletadas(deletadas);
-
-    
-      setVagas(remainingVagas);
-
+  // Fetch methods
+  const fetchVagas = async () => {
+    try {
+      const response = await fetch(`${URL_KEY}/read`);
+      const data = await response.json();
+      setVagas(data.filter((v) => v.ativo === 1));
       setSelectedRows([]);
-
-      console.log("Deletadas:", deletadas);
+    } catch (error) {
+      console.error("Erro ao buscar vagas sinal:", error);
     }
   };
 
-
-  const handleRedo = () => {
-    if (vagasDeletadas.length > 0) {
-   
-      const restauradas = [...vagas, ...vagasDeletadas];
-      setVagas(restauradas); 
-      setVagasDeletadas([]); 
-      console.log("Restauradas:", vagasDeletadas);
+  const fetchDeletedRecords = async () => {
+    try {
+      const response = await fetch(`${URL_KEY}/inativos`);
+      const data = await response.json();
+      setDeletedRecords(data);
+      setCanRestore(data.length > 0);
+    } catch (error) {
+      console.error("Erro ao buscar registros inativos:", error);
     }
   };
 
-  const columns = [
-    { field: "id", headerName: "ID" },
+  useEffect(() => {
+    fetchVagas();
+    fetchDeletedRecords();
+  }, []);
 
-    {
-      field: "data",
-      headerName: "Data",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
+  const handleRowSelection = (newSelectionModel) => {
+    setSelectedRows(newSelectionModel);
+  };
 
-    {
-      field: "coordenador_id",
-      headerName: "Coordenador",
-      flex: 1,
-    },
+  const handleOpenEditDialog = (vaga) => {
+    setSelectedVaga(vaga);
+    setOpenEditDialog(true);
+  };
 
-    {
-      field: "unidade_id",
-      headerName: "Unidade",
-      flex: 1,
-    },
+  const handleEditSubmit = async (values, { setSubmitting }) => {
+    try {
+      const response = await fetch(`${URL_KEY}/update/${selectedVaga.tarefa_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values)
+      });
 
-    {
-      field: "tarefa_id",
-      headerName: "Tarefa",
-      flex: 1,
-    },
+      if (!response.ok) throw new Error("Erro ao atualizar vaga");
 
-    {
-        field: "dia",
-        headerName: "Dia",
-        flex: 1,
-      },
+      await fetchVagas();
+      setOpenEditDialog(false);
+      showMessage(`Cadastro da vaga "${values.tarefa_id}" atualizado com sucesso.`, "success");
+    } catch (error) {
+      showMessage(`Erro ao editar: ${error.message}`, "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-      {
-        field: "horario",
-        headerName: "Horário",
-        flex: 1,
-      },
+  const handleDelete = async () => {
+    try {
+      const deletedVaga = vagas.find(v => v.tarefa_id === selectedRows[0]);
+      const response = await fetch(`${URL_KEY}/soft_delete/${selectedRows[0]}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+      });
 
-      {
-        field: "vagas?",
-        headerName: "Vagas?",
-        flex: 1,
-      },
+      if (!response.ok) throw new Error("Erro ao excluir vaga");
 
-      {
-        field: "descricao",
-        headerName: "Descrição",
-        flex: 1,
-      },
+      await fetchVagas();
+      await fetchDeletedRecords();
+      showMessage(`Cadastro da vaga "${deletedVaga.tarefa_id}" removido com sucesso.`, "delete");
+    } catch (error) {
+      showMessage(`Erro ao deletar: ${error.message}`, "error");
+    }
+  };
 
-      {
-        field: "status_vaga_id",
-        headerName: "Status-Vaga",
-        flex: 1,
-      },
+  const handleRestore = async (id) => {
+    try {
+      const restoredVaga = deletedRecords.find(v => v.tarefa_id === id);
+      const response = await fetch(`${URL_KEY}/restaurar/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" }
+      });
 
-  ];
+      if (!response.ok) throw new Error("Erro ao restaurar vaga");
 
-  const customLocaleText = {
-    ...ptBR.components.MuiDataGrid.defaultProps.localeText,
-    filterOperatorDoesNotContain: "não contém",
-    filterOperatorDoesNotEqual: "não é igual",
-    filterOperatorEquals: "igual a",
+      await fetchVagas();
+      await fetchDeletedRecords();
+      showMessage(`Cadastro da vaga "${restoredVaga.tarefa_id}" restaurado com sucesso.`, "success");
+    } catch (error) {
+      showMessage(`Erro ao restaurar: ${error.message}`, "error");
+    }
+  };
+
+  const handlePermanentDelete = async (id) => {
+    try {
+      const permanentDeletedVaga = deletedRecords.find(v => v.tarefa_id === id);
+      const response = await fetch(`${URL_KEY}/delete/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      if (!response.ok) throw new Error("Erro ao excluir permanentemente");
+
+      await fetchDeletedRecords();
+      showMessage(`Cadastro da vaga "${permanentDeletedVaga.tarefa_id}" 
+        excluído permanentemente do banco de dados.`, "delete");
+    } catch (error) {
+      showMessage(`Erro ao excluir: ${error.message}`, "error");
+    }
+  };
+
+  const showMessage = (text, type = "success", duration = 2000) => {
+    setMessage(text);
+    setMessageType(type === "delete" ? "error" : type); 
+    setMessageVisible(true);
+    setTimeout(() => setMessageVisible(false), duration);
   };
 
   return (
-    <Box m="20px">
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
+    <Box m="10px">
+      {messageVisible && (
+        <Box 
+          mb="20px" 
+          display="flex" 
+          justifyContent="center" 
+          width="100%"
+        >
+          <MessageNotification 
+            message={message}
+            type={messageType}
+            visible={messageVisible}
+          />
+        </Box>
+      )}
 
-          "& .custom-header": {
+      <Box display="flex" justifyContent="start" mb="20px">
+        <Button
+          variant="contained"
+          onClick={() => setOpenAddDialog(true)}
+          sx={{
             backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
-          },
+            color: colors.grey[100],
+            '&:hover': {
+              backgroundColor: colors.blueAccent[600],
+            }
+          }}
+        >
+          Nova Vaga
+        </Button>
+      </Box>
 
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
+      <TableVagas 
+        vagas={vagas}
+        onRowSelect={handleRowSelection}
+        handleOpenEditDialog={handleOpenEditDialog}
+      />
 
-          "& .MuiDataGrid-columnHeader": {
-            backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
-          },
-
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
-          },
-
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[100]} !important`,
-          },
+      <Dialog 
+        open={openAddDialog} 
+        onClose={() => setOpenAddDialog(false)}
+        PaperProps={{
+          style: {
+            width: '40%',
+            maxWidth: 'none',
+            maxHeight: 'none',
+            borderRadius: '8px'
+          }
         }}
       >
-        <DataGrid
-          checkboxSelection
-          rows={vagas}
-          columns={columns}
-          localeText={customLocaleText}
-          slots={{ toolbar: GridToolbar }}
-          onRowSelectionModelChange={(newSelectionModel) => {
-            setSelectedRows(newSelectionModel);
-          }}
-        />
-      </Box>
+        <DialogContent>
+          <AddVaga 
+            onClose={() => setOpenAddDialog(false)}
+            onSuccess={(msg, type = "success") => {
+              showMessage(msg, type);
+              fetchVagas();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Typography 
+        variant="body2" 
+        color="primary" 
+        onClick={() => setOpenHistoryModal(true)}
+        sx={{
+          position: 'absolute',
+          cursor: 'pointer', 
+          mr: 2,
+          mt: 2,
+          color: colors.greenAccent[400],
+          '&:hover': { 
+            textDecoration: 'underline',
+            color: colors.greenAccent[300] 
+          }
+        }}
+      >
+        Mostrar histórico de exclusões
+      </Typography>
+
+      <EditVaga 
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        vaga={selectedVaga}
+        onSubmit={handleEditSubmit}
+      />
+
+      <DeleteHistoryModal 
+        open={openHistoryModal}
+        onClose={() => setOpenHistoryModal(false)}
+        deletedRecords={deletedRecords}
+        onRestore={handleRestore}
+        onPermanentDelete={handlePermanentDelete}
+      />
+
       <Box display="flex" justifyContent="end" mt="20px">
         <Button
           variant="contained"
+          disabled={selectedRows.length === 0}
+          onClick={handleDelete}
           sx={{
             backgroundColor: selectedRows.length > 0 ? "#d32f2f" : "#e57373",
             color: "#fff",
-            cursor: selectedRows.length > 0 ? "pointer" : "not-allowed",
-            marginRight: "10px",
-            "&:hover": {
-              backgroundColor: selectedRows.length > 0 ? "#c62828" : "#e57373",
-            },
+            marginRight: "10px"
           }}
-          disabled={selectedRows.length === 0}
-          onClick={handleDelete}
         >
           Deletar
         </Button>
+
         <Button
           variant="contained"
+          disabled={!canRestore}
+          onClick={() => setOpenHistoryModal(true)}
           sx={{
-            backgroundColor:
-              vagasDeletadas.length > 0 ? "#2e7d32" : "#81c784",
-            color: "#fff",
-            cursor: vagasDeletadas.length > 0 ? "pointer" : "not-allowed",
-            "&:hover": {
-              backgroundColor:
-                vagasDeletadas.length > 0 ? "#1b5e20" : "#81c784",
-            },
+            backgroundColor: canRestore ? "#2e7d32" : "#81c784",
+            color: "#fff"
           }}
-          disabled={vagasDeletadas.length === 0}
-          onClick={handleRedo}
         >
           Refazer
         </Button>

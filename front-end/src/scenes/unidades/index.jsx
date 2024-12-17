@@ -3,39 +3,44 @@ import { Box, Button, Typography, Dialog, DialogContent } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
 
+// Importações dos componentes
 import DeleteHistoryModal from "./DeleteHistoryModal";
-import EditVoluntario from "./EditVoluntario";
+import EditUnidade from "./EditUnidade";
 import MessageNotification from "./MessageNotification";
-import TableVoluntarios from "./TableVoluntarios";
-import AddVoluntario from "./AddVoluntario";
+import TableUnidades from "./TableUnidades";
+import AddUnidade from "./AddUnidade";
 
-const Voluntarios = () => {
+const Unidades = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const URL_KEY = "http://localhost:5000/voluntarios";
+  const URL_KEY = "http://localhost:5000/unidades";
  
-  const [voluntarios, setVoluntarios] = useState([]);
+  // Estados
+  const [unidades, setUnidades] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [deletedRecords, setDeletedRecords] = useState([]);
   const [canRestore, setCanRestore] = useState(false);
 
+  // Estados para modais e mensagens
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openHistoryModal, setOpenHistoryModal] = useState(false);
-  const [selectedVoluntario, setSelectedVoluntario] = useState(null);
+  const [selectedUnidade, setSelectedUnidade] = useState(null);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   
+  // Estados de mensagens
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
   const [messageVisible, setMessageVisible] = useState(false);
 
-  const fetchVoluntarios = async () => {
+  // Fetch methods
+  const fetchUnidades = async () => {
     try {
       const response = await fetch(`${URL_KEY}/read`);
       const data = await response.json();
-      setVoluntarios(data.filter((v) => v.ativo === 1));
+      setUnidades(data.filter((c) => c.ativo === 1));
       setSelectedRows([]);
     } catch (error) {
-      console.error("Erro ao buscar voluntários:", error);
+      console.error("Erro ao buscar unidades:", error);
     }
   };
 
@@ -51,7 +56,7 @@ const Voluntarios = () => {
   };
 
   useEffect(() => {
-    fetchVoluntarios();
+    fetchUnidades();
     fetchDeletedRecords();
   }, []);
 
@@ -59,22 +64,22 @@ const Voluntarios = () => {
     setSelectedRows(newSelectionModel);
   };
 
-  const handleOpenEditDialog = (voluntario) => {
-    setSelectedVoluntario(voluntario);
+  const handleOpenEditDialog = (unidade) => {
+    setSelectedUnidade(unidade);
     setOpenEditDialog(true);
   };
 
   const handleEditSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch(`${URL_KEY}/update/${selectedVoluntario.id}`, {
+      const response = await fetch(`${URL_KEY}/update/${selectedUnidade.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values)
       });
 
-      if (!response.ok) throw new Error("Erro ao atualizar voluntário");
+      if (!response.ok) throw new Error("Erro ao atualizar unidade");
 
-      await fetchVoluntarios();
+      await fetchUnidades();
       setOpenEditDialog(false);
       showMessage(`Cadastro de "${values.nome}" atualizado com sucesso.`, "success");
     } catch (error) {
@@ -86,17 +91,17 @@ const Voluntarios = () => {
 
   const handleDelete = async () => {
     try {
-      const deletedVoluntario = voluntarios.find(v => v.id === selectedRows[0]);
+      const deletedUnidade = unidades.find(c => c.id === selectedRows[0]);
       const response = await fetch(`${URL_KEY}/soft_delete/${selectedRows[0]}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
 
-      if (!response.ok) throw new Error("Erro ao excluir voluntário");
+      if (!response.ok) throw new Error("Erro ao excluir unidade");
 
-      await fetchVoluntarios();
+      await fetchUnidades();
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${deletedVoluntario.nome}" removido com sucesso.`, "delete");
+      showMessage(`Cadastro de "${deletedUnidade.nome}" removido com sucesso.`, "delete");
     } catch (error) {
       showMessage(`Erro ao deletar: ${error.message}`, "error");
     }
@@ -104,17 +109,17 @@ const Voluntarios = () => {
 
   const handleRestore = async (id) => {
     try {
-      const restoredVoluntario = deletedRecords.find(v => v.id === id);
+      const restoredUnidade = deletedRecords.find(c => c.id === id);
       const response = await fetch(`${URL_KEY}/restaurar/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" }
       });
 
-      if (!response.ok) throw new Error("Erro ao restaurar voluntário");
+      if (!response.ok) throw new Error("Erro ao restaurar unidade");
 
-      await fetchVoluntarios();
+      await fetchUnidades();
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${restoredVoluntario.nome}" restaurado com sucesso.`, "success");
+      showMessage(`Cadastro de "${restoredUnidade.nome}" restaurado com sucesso.`, "success");
     } catch (error) {
       showMessage(`Erro ao restaurar: ${error.message}`, "error");
     }
@@ -122,7 +127,7 @@ const Voluntarios = () => {
 
   const handlePermanentDelete = async (id) => {
     try {
-      const permanentDeletedVoluntario = deletedRecords.find(v => v.id === id);
+      const permanentDeletedUnidade = deletedRecords.find(c => c.id === id);
       const response = await fetch(`${URL_KEY}/delete/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
@@ -131,8 +136,7 @@ const Voluntarios = () => {
       if (!response.ok) throw new Error("Erro ao excluir permanentemente");
 
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${permanentDeletedVoluntario.nome}" excluído permanentemente 
-      do banco de dados.`, "delete");
+      showMessage(`Cadastro de "${permanentDeletedUnidade.nome}" excluído permanentemente do banco de dados.`, "delete");
     } catch (error) {
       showMessage(`Erro ao excluir: ${error.message}`, "error");
     }
@@ -174,12 +178,12 @@ const Voluntarios = () => {
             }
           }}
         >
-          Novo Voluntário
+          Nova Unidade
         </Button>
       </Box>
 
-      <TableVoluntarios 
-        voluntarios={voluntarios}
+      <TableUnidades 
+        unidades={unidades}
         onRowSelect={handleRowSelection}
         handleOpenEditDialog={handleOpenEditDialog}
       />
@@ -197,11 +201,11 @@ const Voluntarios = () => {
         }}
       >
         <DialogContent>
-          <AddVoluntario 
+          <AddUnidade 
             onClose={() => setOpenAddDialog(false)}
             onSuccess={(msg, type = "success") => {
               showMessage(msg, type);
-              fetchVoluntarios();
+              fetchUnidades();
             }}
           />
         </DialogContent>
@@ -226,10 +230,10 @@ const Voluntarios = () => {
         Mostrar histórico de exclusões
       </Typography>
 
-      <EditVoluntario 
+      <EditUnidade 
         open={openEditDialog}
         onClose={() => setOpenEditDialog(false)}
-        voluntario={selectedVoluntario}
+        unidade={selectedUnidade}
         onSubmit={handleEditSubmit}
       />
 
@@ -271,4 +275,4 @@ const Voluntarios = () => {
   );
 };
 
-export default Voluntarios;
+export default Unidades;

@@ -1,7 +1,9 @@
-from flask import jsonify, request
+# database.py
+
 import mysql.connector
 import os
 from dotenv import load_dotenv
+from flask import jsonify
 
 load_dotenv()
 
@@ -15,7 +17,7 @@ def conectar_db():
         )
     except mysql.connector.Error as err:
         print(f"Erro ao conectar ao banco de dados: {err}")
-        return None  
+        return None
 
 def criar_coordenador(conexao, dados):
     if not conexao:
@@ -119,21 +121,4 @@ def restaurar_coordenador(id, conexao):
     except Exception as e:
         raise RuntimeError(f"Erro ao restaurar coordenador: {e}")
     finally:
-        cursor.close()
-
-def get_tarefas():
-    conexao = conectar_db()
-    if conexao is None:
-        return jsonify({"error": "Erro ao conectar ao banco de dados"}), 500
-
-    try:
-        cursor = conexao.cursor(dictionary=True)
-        query = "SELECT nome_tarefa FROM tipo_tarefa"
-        cursor.execute(query)
-        tarefas = cursor.fetchall()
-        return jsonify([tarefa['nome_tarefa'] for tarefa in tarefas])
-    except Exception as e:
-        return jsonify({"error": f"Erro ao buscar tarefas: {e}"}), 500
-    finally:
-        cursor.close()
-        conexao.close()
+      cursor.close()

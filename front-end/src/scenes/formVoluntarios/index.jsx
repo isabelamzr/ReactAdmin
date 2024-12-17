@@ -3,7 +3,6 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useState } from "react";
-import { mockDataUnidade, mockDataTarefas, mockDataVagas, mockDataHabilidades } from "../../data/mockData";
 
 const initialValues = {
   nomeVoluntario: "",
@@ -41,20 +40,6 @@ const FormVoluntarios = () => {
   const [tarefas, setTarefas] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const [controleVagas, setControleVagas] = useState([]);
-
-  useEffect(() => {
-    const descricoesHabilidades = [...new Set(mockDataHabilidades.map(habilidade => habilidade.descricao))];
-    setHabilidades(descricoesHabilidades);
-
-    const tiposTarefas = [...new Set(mockDataTarefas.map(tarefa => tarefa.tipo_tarefa_id))];
-    setTarefas(tiposTarefas);
-
-    const nomesUnidades = [...new Set(mockDataUnidade.map(unidade => unidade.nome))];
-    setUnidades(nomesUnidades);
-
-    const coordenadorIds = [...new Set(mockDataVagas.map(vaga => vaga.coordenador_id))];
-    setControleVagas(coordenadorIds);
-  }, []);
 
   const handleFormSubmit = (values) => {
     console.log("Novo voluntário criado:", values);

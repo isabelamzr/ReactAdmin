@@ -3,39 +3,44 @@ import { Box, Button, Typography, Dialog, DialogContent } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
 
+// Importações dos componentes
 import DeleteHistoryModal from "./DeleteHistoryModal";
-import EditVoluntario from "./EditVoluntario";
+import EditTipoTarefa from "./EditTipoTarefa";
 import MessageNotification from "./MessageNotification";
-import TableVoluntarios from "./TableVoluntarios";
-import AddVoluntario from "./AddVoluntario";
+import TableTiposTarefas from "./TableTiposTarefas";
+import AddTipoTarefa from "./AddTipoTarefa";
 
-const Voluntarios = () => {
+const TiposTarefas = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const URL_KEY = "http://localhost:5000/voluntarios";
+  const URL_KEY = "http://localhost:5000/tipo_tarefa";
  
-  const [voluntarios, setVoluntarios] = useState([]);
+  // Estados
+  const [tiposTarefas, setTiposTarefas] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [deletedRecords, setDeletedRecords] = useState([]);
   const [canRestore, setCanRestore] = useState(false);
 
+  // Estados para modais e mensagens
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openHistoryModal, setOpenHistoryModal] = useState(false);
-  const [selectedVoluntario, setSelectedVoluntario] = useState(null);
+  const [selectedTipoTarefa, setSelectedTipoTarefa] = useState(null);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   
+  // Estados de mensagens
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
   const [messageVisible, setMessageVisible] = useState(false);
 
-  const fetchVoluntarios = async () => {
+  // Fetch methods
+  const fetchTiposTarefas = async () => {
     try {
       const response = await fetch(`${URL_KEY}/read`);
       const data = await response.json();
-      setVoluntarios(data.filter((v) => v.ativo === 1));
+      setTiposTarefas(data.filter((c) => c.ativo === 1));
       setSelectedRows([]);
     } catch (error) {
-      console.error("Erro ao buscar voluntários:", error);
+      console.error("Erro ao buscar tipos de tarefas:", error);
     }
   };
 
@@ -51,7 +56,7 @@ const Voluntarios = () => {
   };
 
   useEffect(() => {
-    fetchVoluntarios();
+    fetchTiposTarefas();
     fetchDeletedRecords();
   }, []);
 
@@ -59,24 +64,24 @@ const Voluntarios = () => {
     setSelectedRows(newSelectionModel);
   };
 
-  const handleOpenEditDialog = (voluntario) => {
-    setSelectedVoluntario(voluntario);
+  const handleOpenEditDialog = (tipoTarefa) => {
+    setSelectedTipoTarefa(tipoTarefa);
     setOpenEditDialog(true);
   };
 
   const handleEditSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch(`${URL_KEY}/update/${selectedVoluntario.id}`, {
+      const response = await fetch(`${URL_KEY}/update/${selectedTipoTarefa.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values)
       });
 
-      if (!response.ok) throw new Error("Erro ao atualizar voluntário");
+      if (!response.ok) throw new Error("Erro ao atualizar tipo de tarefa");
 
-      await fetchVoluntarios();
+      await fetchTiposTarefas();
       setOpenEditDialog(false);
-      showMessage(`Cadastro de "${values.nome}" atualizado com sucesso.`, "success");
+      showMessage(`Cadastro de "${values.nome_tarefa}" atualizado com sucesso.`, "success");
     } catch (error) {
       showMessage(`Erro ao editar: ${error.message}`, "error");
     } finally {
@@ -86,17 +91,17 @@ const Voluntarios = () => {
 
   const handleDelete = async () => {
     try {
-      const deletedVoluntario = voluntarios.find(v => v.id === selectedRows[0]);
+      const deletedTipoTarefa = tiposTarefas.find(c => c.id === selectedRows[0]);
       const response = await fetch(`${URL_KEY}/soft_delete/${selectedRows[0]}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
 
-      if (!response.ok) throw new Error("Erro ao excluir voluntário");
+      if (!response.ok) throw new Error("Erro ao excluir tipo de tarefa");
 
-      await fetchVoluntarios();
+      await fetchTiposTarefas();
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${deletedVoluntario.nome}" removido com sucesso.`, "delete");
+      showMessage(`Cadastro de "${deletedTipoTarefa.nome_tarefa}" removido com sucesso.`, "delete");
     } catch (error) {
       showMessage(`Erro ao deletar: ${error.message}`, "error");
     }
@@ -104,17 +109,17 @@ const Voluntarios = () => {
 
   const handleRestore = async (id) => {
     try {
-      const restoredVoluntario = deletedRecords.find(v => v.id === id);
+      const restoredTipoTarefa = deletedRecords.find(c => c.id === id);
       const response = await fetch(`${URL_KEY}/restaurar/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" }
       });
 
-      if (!response.ok) throw new Error("Erro ao restaurar voluntário");
+      if (!response.ok) throw new Error("Erro ao restaurar tipo de tarefa");
 
-      await fetchVoluntarios();
+      await fetchTiposTarefas();
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${restoredVoluntario.nome}" restaurado com sucesso.`, "success");
+      showMessage(`Cadastro de "${restoredTipoTarefa.nome_tarefa}" restaurado com sucesso.`, "success");
     } catch (error) {
       showMessage(`Erro ao restaurar: ${error.message}`, "error");
     }
@@ -122,7 +127,7 @@ const Voluntarios = () => {
 
   const handlePermanentDelete = async (id) => {
     try {
-      const permanentDeletedVoluntario = deletedRecords.find(v => v.id === id);
+      const permanentDeletedTipoTarefa = deletedRecords.find(c => c.id === id);
       const response = await fetch(`${URL_KEY}/delete/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
@@ -131,8 +136,7 @@ const Voluntarios = () => {
       if (!response.ok) throw new Error("Erro ao excluir permanentemente");
 
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${permanentDeletedVoluntario.nome}" excluído permanentemente 
-      do banco de dados.`, "delete");
+      showMessage(`Cadastro de "${permanentDeletedTipoTarefa.nome_tarefa}" excluído permanentemente do banco de dados.`, "delete");
     } catch (error) {
       showMessage(`Erro ao excluir: ${error.message}`, "error");
     }
@@ -174,12 +178,12 @@ const Voluntarios = () => {
             }
           }}
         >
-          Novo Voluntário
+          Novo Tipo de Tarefa
         </Button>
       </Box>
 
-      <TableVoluntarios 
-        voluntarios={voluntarios}
+      <TableTiposTarefas 
+        tiposTarefas={tiposTarefas}
         onRowSelect={handleRowSelection}
         handleOpenEditDialog={handleOpenEditDialog}
       />
@@ -197,11 +201,11 @@ const Voluntarios = () => {
         }}
       >
         <DialogContent>
-          <AddVoluntario 
+          <AddTipoTarefa 
             onClose={() => setOpenAddDialog(false)}
             onSuccess={(msg, type = "success") => {
               showMessage(msg, type);
-              fetchVoluntarios();
+              fetchTiposTarefas();
             }}
           />
         </DialogContent>
@@ -226,10 +230,10 @@ const Voluntarios = () => {
         Mostrar histórico de exclusões
       </Typography>
 
-      <EditVoluntario 
+      <EditTipoTarefa 
         open={openEditDialog}
         onClose={() => setOpenEditDialog(false)}
-        voluntario={selectedVoluntario}
+        coordenador={selectedTipoTarefa}
         onSubmit={handleEditSubmit}
       />
 
@@ -271,4 +275,4 @@ const Voluntarios = () => {
   );
 };
 
-export default Voluntarios;
+export default TiposTarefas;

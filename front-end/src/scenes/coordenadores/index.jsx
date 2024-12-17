@@ -16,6 +16,7 @@ import AddCoordenador from "./AddCoordenador";
 const Coordenadores = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const URL_KEY = "http://localhost:5000/coordenadores";
  
   // Estados
   const [coordenadores, setCoordenadores] = useState([]);
@@ -37,7 +38,7 @@ const Coordenadores = () => {
   // Fetch methods
   const fetchCoordenadores = async () => {
     try {
-      const response = await fetch("http://localhost:5000/coordenadores/read");
+      const response = await fetch(`${URL_KEY}/read`);
       const data = await response.json();
       setCoordenadores(data.filter((c) => c.ativo === 1));
       setSelectedRows([]);
@@ -48,7 +49,7 @@ const Coordenadores = () => {
 
   const fetchDeletedRecords = async () => {
     try {
-      const response = await fetch("http://localhost:5000/coordenadores/inativos");
+      const response = await fetch(`${URL_KEY}/inativos`);
       const data = await response.json();
       setDeletedRecords(data);
       setCanRestore(data.length > 0);
@@ -73,7 +74,7 @@ const Coordenadores = () => {
 
   const handleEditSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch(`http://localhost:5000/coordenadores/update/${selectedCoordenador.id}`, {
+      const response = await fetch(`${URL_KEY}/update/${selectedCoordenador.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values)
@@ -94,7 +95,7 @@ const Coordenadores = () => {
   const handleDelete = async () => {
     try {
       const deletedCoordenador = coordenadores.find(c => c.id === selectedRows[0]);
-      const response = await fetch(`http://localhost:5000/coordenadores/soft_delete/${selectedRows[0]}`, {
+      const response = await fetch(`${URL_KEY}/soft_delete/${selectedRows[0]}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
@@ -103,7 +104,7 @@ const Coordenadores = () => {
 
       await fetchCoordenadores();
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${deletedCoordenador.nome}" removido com sucesso.`, "success");
+      showMessage(`Cadastro de "${deletedCoordenador.nome}" removido com sucesso.`, "delete");
     } catch (error) {
       showMessage(`Erro ao deletar: ${error.message}`, "error");
     }
@@ -112,7 +113,7 @@ const Coordenadores = () => {
   const handleRestore = async (id) => {
     try {
       const restoredCoordenador = deletedRecords.find(c => c.id === id);
-      const response = await fetch(`http://localhost:5000/coordenadores/restaurar/${id}`, {
+      const response = await fetch(`${URL_KEY}/restaurar/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" }
       });
@@ -130,7 +131,7 @@ const Coordenadores = () => {
   const handlePermanentDelete = async (id) => {
     try {
       const permanentDeletedCoordenador = deletedRecords.find(c => c.id === id);
-      const response = await fetch(`http://localhost:5000/coordenadores/delete/${id}`, {
+      const response = await fetch(`${URL_KEY}/delete/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
@@ -138,7 +139,8 @@ const Coordenadores = () => {
       if (!response.ok) throw new Error("Erro ao excluir permanentemente");
 
       await fetchDeletedRecords();
-      showMessage(`Cadastro de "${permanentDeletedCoordenador.nome}" excluído permanentemente do banco de dados.`, "success");
+      showMessage(`Cadastro de "${permanentDeletedCoordenador.nome}" excluído permanentemente 
+      do banco de dados.`, "delete");
     } catch (error) {
       showMessage(`Erro ao excluir: ${error.message}`, "error");
     }
@@ -146,7 +148,7 @@ const Coordenadores = () => {
 
   const showMessage = (text, type = "success", duration = 2000) => {
     setMessage(text);
-    setMessageType(type);
+    setMessageType(type === "delete" ? "error" : type); 
     setMessageVisible(true);
     setTimeout(() => setMessageVisible(false), duration);
   };

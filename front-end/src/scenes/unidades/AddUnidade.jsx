@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, TextField, MenuItem, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,14 +7,14 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 const initialValues = {
   nome: "",
   telefone: "",
-  email: "",
-  genero: "",
+  endereco: "",
+  bairro: "",
+  cidade: "",
+  UF: "",
 };
 
 const phoneRegExp =
   /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)?[0-9]{4,5}[-]?[0-9]{4}$/;
-
-const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const checkoutSchema = yup.object().shape({
   nome: yup.string().required("Campo obrigatório"),
@@ -22,16 +22,15 @@ const checkoutSchema = yup.object().shape({
     .string()
     .matches(phoneRegExp, "Este número é inválido")
     .required("Campo obrigatório"),
-  email: yup
-    .string()
-    .matches(emailRegExp, "Este e-mail é inválido")
-    .required("Campo obrigatório"),
-  genero: yup.string().required("Campo obrigatório"),
+  endereco: yup.string().required("Campo obrigatório"),
+  bairro: yup.string().required("Campo obrigatório"),
+  cidade: yup.string().required("Campo obrigatório"),
+  UF: yup.string().required("Campo obrigatório"),
 });
 
-const AddCoordenador = ({ onClose, onSuccess }) => {
+const AddUnidade = ({ onClose, onSuccess }) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const URL_KEY = "http://localhost:5000/coordenadores";
+  const URL_KEY = "http://localhost:5000/unidades";
 
   const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
@@ -46,7 +45,7 @@ const AddCoordenador = ({ onClose, onSuccess }) => {
         onSuccess(data.message);
         onClose();
       } else {
-        throw new Error(data.message || "Erro ao criar coordenador");
+        throw new Error("Erro ao criar unidade");
       }
     } catch (error) {
       onSuccess(error.message, "error");
@@ -97,7 +96,7 @@ const AddCoordenador = ({ onClose, onSuccess }) => {
                   fullWidth
                   variant="filled"
                   type="text"
-                  placeholder="Ex: Maria Silva"
+                  placeholder="Ex: Nova Luz"
                   onBlur={handleBlur}
                   onFocus={() => setFieldTouched('nome', true, false)}
                   onChange={handleChange}
@@ -124,7 +123,7 @@ const AddCoordenador = ({ onClose, onSuccess }) => {
                   fullWidth
                   variant="filled"
                   type="text"
-                  placeholder="Ex: (31) 9 9999-9999"
+                  placeholder="Ex: (31) 99999-9999"
                   onBlur={handleBlur}
                   onFocus={() => setFieldTouched('telefone', true, false)}
                   onChange={handleChange}
@@ -141,24 +140,24 @@ const AddCoordenador = ({ onClose, onSuccess }) => {
                   sx={{ 
                     mb: 1, 
                     color: 'text.secondary', 
-                    fontSize: touched.email ? '0.8rem' : '1rem',
+                    fontSize: touched.endereco ? '0.8rem' : '1rem',
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  E-mail
+                  Endereço
                 </Typography>
                 <TextField
                   fullWidth
                   variant="filled"
-                  type="email"
-                  placeholder="Ex: email@email.com"
+                  type="text"
+                  placeholder="Ex: Rua das Camélias, 1110"
                   onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('email', true, false)}
+                  onFocus={() => setFieldTouched('endereco', true, false)}
                   onChange={handleChange}
-                  value={values.email}
-                  name="email"
-                  error={!!touched.email && !!errors.email}
-                  helperText={touched.email && errors.email}
+                  value={values.endereco}
+                  name="endereco"
+                  error={!!touched.endereco && !!errors.endereco}
+                  helperText={touched.endereco && errors.endereco}
                 />
               </Box>
 
@@ -168,31 +167,79 @@ const AddCoordenador = ({ onClose, onSuccess }) => {
                   sx={{ 
                     mb: 1, 
                     color: 'text.secondary', 
-                    fontSize: touched.genero ? '0.8rem' : '1rem',
+                    fontSize: touched.bairro ? '0.8rem' : '1rem',
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  Gênero
+                  Bairro
                 </Typography>
                 <TextField
-                  select
                   fullWidth
                   variant="filled"
-                  name="genero"
-                  value={values.genero}
-                  onChange={handleChange}
+                  type="text"
+                  placeholder="Ex: Rosaneves"
                   onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('genero', true, false)}
-                  error={!!touched.genero && !!errors.genero}
-                  helperText={touched.genero && errors.genero}
+                  onFocus={() => setFieldTouched('bairro', true, false)}
+                  onChange={handleChange}
+                  value={values.bairro}
+                  name="bairro"
+                  error={!!touched.bairro && !!errors.bairro}
+                  helperText={touched.bairro && errors.bairro}
+                />
+              </Box>
+
+              <Box sx={{ gridColumn: "span 2" }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mb: 1, 
+                    color: 'text.secondary', 
+                    fontSize: touched.cidade ? '0.8rem' : '1rem',
+                    transition: 'all 0.2s ease'
+                  }}
                 >
-                  {["Mulher Cis", "Homem Cis", "Mulher Trans", "Homem Trans", 
-                  "Não-Binário", "Agênero", "Outro"].map((option, index) => (
-                    <MenuItem key={index} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                  Cidade
+                </Typography>
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  type="text"
+                  placeholder="Ex: Ribeirão das Neves"
+                  onBlur={handleBlur}
+                  onFocus={() => setFieldTouched('cidade', true, false)}
+                  onChange={handleChange}
+                  value={values.cidade}
+                  name="cidade"
+                  error={!!touched.cidade && !!errors.cidade}
+                  helperText={touched.cidade && errors.cidade}
+                />
+              </Box>
+
+              <Box sx={{ gridColumn: "span 2" }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mb: 1, 
+                    color: 'text.secondary', 
+                    fontSize: touched.UF ? '0.8rem' : '1rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  UF
+                </Typography>
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  type="text"
+                  placeholder="Ex: MG"
+                  onBlur={handleBlur}
+                  onFocus={() => setFieldTouched('UF', true, false)}
+                  onChange={handleChange}
+                  value={values.UF}
+                  name="UF"
+                  error={!!touched.UF && !!errors.UF}
+                  helperText={touched.UF && errors.UF}
+                />
               </Box>
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
@@ -202,7 +249,7 @@ const AddCoordenador = ({ onClose, onSuccess }) => {
                 variant="contained"
                 disabled={isSubmitting}
               >
-                Criar Novo Coordenador
+                Criar Nova Unidade
               </Button>
             </Box>
           </form>
@@ -212,4 +259,4 @@ const AddCoordenador = ({ onClose, onSuccess }) => {
   );
 };
 
-export default AddCoordenador;
+export default AddUnidade;

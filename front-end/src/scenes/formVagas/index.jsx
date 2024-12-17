@@ -2,8 +2,7 @@ import { Box, Button, TextField, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useEffect, useState } from "react";
-import { mockDataCoordenadores, mockDataUnidade, mockDataTarefas, mockDataVagas } from "../../data/mockData";
+import { useState } from "react";
 
 const initialValues = {
   DataDaDivulgacao: "",
@@ -35,47 +34,10 @@ const FormVagas = () => {
   const [dias, setDias] = useState([]);
   const [horarios, setHorarios] = useState([]);
 
-  useEffect(() => {
-    const nomesCoordenadores = [...new Set(mockDataCoordenadores.map(coord => coord.nome))];
-    setCoordenadores(nomesCoordenadores);
-
-    const nomesUnidades = [...new Set(mockDataUnidade.map(unidade => unidade.nome))];
-    setUnidades(nomesUnidades);
-
-    const tiposTarefas = [...new Set(mockDataTarefas.map(tarefa => tarefa.tipo_tarefa_id))];
-    setTarefas(tiposTarefas);
-
-    const diasTarefas = [...new Set(mockDataTarefas.map(tarefa => tarefa.dia))];
-    setDias(diasTarefas);
-
-    const horariosTarefas = [...new Set(mockDataTarefas.map(tarefa => tarefa.horario))];
-    setHorarios(horariosTarefas);
-  }, []);
-
-  const handleFormSubmit = (values) => {
-    const newId = mockDataVagas.length ? mockDataVagas[mockDataVagas.length - 1].id + 1 : 1;
-
-    const newVaga = {
-      id: newId,
-      data: values.DataDaDivulgacao,
-      coordenador_id: values.coordenador,
-      unidade_id: values.unidade,
-      tarefa_id: values.tarefa,
-      dia: values.dia,
-      horario: values.horario,
-      vagas: values.numeroVagas,
-      descricao: values.descricaoVagas,
-      status_vaga_id: "1"  
-    };
-
-    mockDataVagas.push(newVaga);
-    console.log("Nova vaga criada:", newVaga);
-  };
 
   return (
     <Box m="20px">
       <Formik
-        onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={checkoutSchema}
       >

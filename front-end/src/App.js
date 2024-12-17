@@ -15,8 +15,8 @@ import FormCoordenadores from "./scenes/formCoordenadores/index.jsx";
 import Calendar from "./scenes/calendar"
 import Habilidades from "./scenes/habilidades/index.jsx"
 import StatusVagas from "./scenes/statusVagas/index.jsx"
-import TipoTarefa from "./scenes/tipoTarefa/index.jsx"
-import Unidade from "./scenes/unidade/index.jsx"
+import TipoTarefa from "./scenes/tiposTarefas/index.jsx"
+import Unidade from "./scenes/unidades/index.jsx"
 
 function App() {
   const [theme, colorMode] = useMode();
