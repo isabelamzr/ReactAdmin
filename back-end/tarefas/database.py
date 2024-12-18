@@ -22,21 +22,60 @@ def conectar_db():
 def criar_tarefa(conexao, dados):
     if not conexao:
         return jsonify({"message": "Erro ao conectar ao banco"}), 500
-
-    cursor = conexao.cursor()
-    query = "INSERT INTO tarefa (tipo_tarefa_id, dia, horario, coordenador_id, unidade_id, voluntario_id, local) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-    valores = (dados['tipo_tarefa_id'], dados['dia'], dados['horario'], dados['coordenador_id'], dados['unidade_id'], dados['voluntario_id'], dados['local'])
+    
+    print("DADOS RECEBIDOS:", dados)
+    cursor = conexao.cursor(dictionary=True)
 
     try:
+        # Debug: Imprimir todos os dados antes da conversão
+        print("Convertendo tipo_tarefa")
+        if isinstance(dados['tipo_tarefa_id'], str):
+            cursor.execute("SELECT id FROM tipo_tarefa WHERE nome_tarefa = %s", (dados['tipo_tarefa_id'],))
+            tipo_tarefa = cursor.fetchone()
+            print(f"Tipo Tarefa: {tipo_tarefa}")
+            if not tipo_tarefa:
+                return jsonify({"message": f"Tipo de tarefa não encontrado: {dados['tipo_tarefa_id']}"}), 400
+            dados['tipo_tarefa_id'] = tipo_tarefa['id']
+
+        print("Convertendo unidade")
+        if isinstance(dados['unidade_id'], str):
+            cursor.execute("SELECT id FROM unidade WHERE nome = %s", (dados['unidade_id'].strip(),))
+            unidade = cursor.fetchone()
+            print(f"Unidade: {unidade}")
+            if not unidade:
+                return jsonify({"message": f"Unidade não encontrada: {dados['unidade_id']}"}), 400
+            dados['unidade_id'] = unidade['id']
+
+        print("Convertendo voluntário")
+        if isinstance(dados['voluntario_id'], str):
+            cursor.execute("SELECT id FROM voluntarios WHERE nome = %s", (dados['voluntario_id'].strip(),))
+            voluntario = cursor.fetchone()
+            print(f"Voluntário: {voluntario}")
+            if not voluntario:
+                return jsonify({"message": f"Voluntário não encontrado: {dados['voluntario_id']}"}), 400
+            dados['voluntario_id'] = voluntario['id']
+
+        # Validação dos campos obrigatórios
+        campos_obrigatorios = ['tipo_tarefa_id', 'dia', 'horario', 'coordenador_id', 'unidade_id', 'voluntario_id', 'local']
+        for campo in campos_obrigatorios:
+            if campo not in dados or not dados[campo]:
+                return jsonify({"message": f"Campo obrigatório ausente: {campo}"}), 400
+
+        query = "INSERT INTO tarefa (tipo_tarefa_id, dia, horario, coordenador_id, unidade_id, voluntario_id, local) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        valores = (dados['tipo_tarefa_id'], dados['dia'], dados['horario'], dados['coordenador_id'], dados['unidade_id'], dados['voluntario_id'], dados['local'])
+        
         cursor.execute(query, valores)
         conexao.commit()
         return jsonify({"message": "Tarefa criada com sucesso!"}), 201
+    
     except Exception as e:
+        print(f"Erro ao criar tarefa: {str(e)}")
+        conexao.rollback()
         return jsonify({"message": f"Erro ao criar tarefa: {str(e)}"}), 500
     finally:
         cursor.close()
         conexao.close()
-
+        
 def obter_tarefas(conexao):
     if conexao is None:
         return jsonify({"error": "Erro ao conectar ao banco de dados"}), 500

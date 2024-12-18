@@ -1,12 +1,15 @@
+// componente AddTarefa.jsx
+
 import React from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
-// removi o required e nao coloquei o dropdown nas colunas tipo id para facilitar o desenvolvimento
-// .required("Campo obrigatório")
-// ver se logica de dropdown precisa de um componente (provavel que sim)
+import CoordenadorDropdown, { 
+  TipoTarefaDropdown, 
+  UnidadeDropdown, 
+  VoluntarioDropdown 
+} from "./DropdownsTarefa";
 
 const initialValues = {
   tipo_tarefa_id: "",
@@ -21,15 +24,16 @@ const initialValues = {
 const horarioRegExp = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 const checkoutSchema = yup.object().shape({
-  tipo_tarefa_id: yup.string(),
-  dia: yup.string(),
+  tipo_tarefa_id: yup.string().required("Tipo de tarefa é obrigatório"),
+  dia: yup.string().required("Dia é obrigatório"),
   horario: yup
     .string()
-    .matches(horarioRegExp, "Horário inválido. Use o formato HH:MM"),
-  coordenador_id: yup.string(),
-  unidade_id: yup.string(),
-  voluntario_id: yup.string(),
-  local: yup.string(),
+    .matches(horarioRegExp, "Horário inválido. Use o formato HH:MM")
+    .required("Horário é obrigatório"),
+  coordenador_id: yup.string().required("Coordenador é obrigatório"),
+  unidade_id: yup.string().required("Unidade é obrigatória"),
+  voluntario_id: yup.string().required("Voluntário é obrigatório"),
+  local: yup.string().required("Local é obrigatório"),
 });
 
 const AddTarefa = ({ onClose, onSuccess }) => {
@@ -73,7 +77,8 @@ const AddTarefa = ({ onClose, onSuccess }) => {
           handleChange,
           handleSubmit,
           isSubmitting,
-          setFieldTouched
+          setFieldTouched,
+          setFieldValue
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
@@ -96,16 +101,12 @@ const AddTarefa = ({ onClose, onSuccess }) => {
                 >
                   Tarefa
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: Reunião Mediúnica"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('tipo_tarefa_id', true, false)}
-                  onChange={handleChange}
-                  value={values.tipo_tarefa_id}
-                  name="tipo_tarefa_id"
+                <TipoTarefaDropdown
+                  value={values.tipo_tarefa_id || ''} 
+                  onChange={(e) => {
+                    const selectedValue = Number(e.target.value);
+                    setFieldValue('tipo_tarefa_id', selectedValue);
+                  }}
                   error={!!touched.tipo_tarefa_id && !!errors.tipo_tarefa_id}
                   helperText={touched.tipo_tarefa_id && errors.tipo_tarefa_id}
                 />
@@ -177,18 +178,13 @@ const AddTarefa = ({ onClose, onSuccess }) => {
                 >
                   Coordenador
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: Maria Silva"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('coordenador_id', true, false)}
-                  onChange={handleChange}
-                  value={values.coordenador_id}
-                  name="coordenador_id"
-                  error={!!touched.coordenador_id && !!errors.coordenador_id}
-                  helperText={touched.coordenador_id && errors.coordenador_id}
+               
+                <CoordenadorDropdown
+                  value={values.coordenador_id || ''} 
+                  onChange={(e) => {
+                    const selectedValue = Number(e.target.value);
+                    setFieldValue('coordenador_id', selectedValue);
+                  }}
                 />
               </Box>
 
@@ -204,16 +200,12 @@ const AddTarefa = ({ onClose, onSuccess }) => {
                 >
                   Unidade
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: AECX - Sede"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('unidade_id', true, false)}
-                  onChange={handleChange}
-                  value={values.unidade_id}
-                  name="unidade_id"
+                <UnidadeDropdown
+                  value={values.unidade_id || ''} 
+                  onChange={(e) => {
+                    const selectedValue = Number(e.target.value);
+                    setFieldValue('unidade_id', selectedValue);
+                  }}
                   error={!!touched.unidade_id && !!errors.unidade_id}
                   helperText={touched.unidade_id && errors.unidade_id}
                 />
@@ -231,16 +223,12 @@ const AddTarefa = ({ onClose, onSuccess }) => {
                 >
                   Voluntário
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: João Silva"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('voluntario_id', true, false)}
-                  onChange={handleChange}
-                  value={values.voluntario_id}
-                  name="voluntario_id"
+                <VoluntarioDropdown
+                  value={values.voluntario_id || ''} 
+                  onChange={(e) => {
+                    const selectedValue = Number(e.target.value);
+                    setFieldValue('voluntario_id', selectedValue);
+                  }}
                   error={!!touched.voluntario_id && !!errors.voluntario_id}
                   helperText={touched.voluntario_id && errors.voluntario_id}
                 />
