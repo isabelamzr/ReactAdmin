@@ -1,8 +1,15 @@
+// AddVaga.jsx
+
 import React from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import CoordenadorDropdown, { 
+  UnidadeDropdown, 
+  TipoTarefaDropdown, 
+  StatusVagaDropdown 
+} from "./DropdownsVagas";
 
 const initialValues = {
   tarefa_id: "",
@@ -38,29 +45,64 @@ const AddVaga = ({ onClose, onSuccess }) => {
   const URL_KEY = "http://localhost:5000/vagas";
 
   const handleFormSubmit = async (values, { setSubmitting }) => {
+    console.log('Início do handleFormSubmit');
+    console.log('Valores enviados:', {
+        ...values,
+        tarefa_id: Number(values.tarefa_id)
+    });
+    
     try {
-      const response = await fetch(URL_KEY, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
+        console.log('URL da requisição:', URL_KEY);
+        console.log('Iniciando fetch com método:', {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            body: JSON.stringify({
+                ...values,
+                tarefa_id: Number(values.tarefa_id)
+            })
+        });
+ 
+        const response = await fetch(URL_KEY, {
+            method: "POST", 
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                ...values,
+                tarefa_id: Number(values.tarefa_id)
+            })
+        });
+        
+        console.log('Response completa:', response);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Erro na resposta:', errorData);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Data recebida:', data);
+        
         onSuccess(data.message);
         onClose();
-      } else {
-        throw new Error("Erro ao criar vaga");
-      }
     } catch (error) {
-      onSuccess(error.message, "error");
+        console.error('Erro detalhado:', error);
+        onSuccess(error.message, "error");
     } finally {
-      setSubmitting(false);
+        console.log('Finally executado');
+        setSubmitting(false);
     }
-  };
-
+};
   return (
-    <Box p="20px">
+    <Box p="20px" sx={{ maxWidth: "600px", height: "90vh", overflowY: "auto" }}>
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -74,6 +116,7 @@ const AddVaga = ({ onClose, onSuccess }) => {
           handleChange,
           handleSubmit,
           isSubmitting,
+          setFieldValue,
           setFieldTouched
         }) => (
           <form onSubmit={handleSubmit}>
@@ -97,18 +140,13 @@ const AddVaga = ({ onClose, onSuccess }) => {
                 >
                   Tarefa
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: Reunião Pública"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('tarefa_id', true, false)}
-                  onChange={handleChange}
-                  value={values.tarefa_id}
-                  name="tarefa_id"
+                <TipoTarefaDropdown
+                  value={values.tarefa_id || ''} 
+                  onChange={(e) => {
+                    const selectedValue = Number(e.target.value);
+                    setFieldValue('tarefa_id', selectedValue);
+                  }}
                   error={!!touched.tarefa_id && !!errors.tarefa_id}
-                  helperText={touched.tarefa_id && errors.tarefa_id}
                 />
               </Box>
 
@@ -151,18 +189,13 @@ const AddVaga = ({ onClose, onSuccess }) => {
                 >
                   Unidade
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: AECX - Sede"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('unidade_id', true, false)}
-                  onChange={handleChange}
-                  value={values.unidade_id}
-                  name="unidade_id"
+                <UnidadeDropdown
+                  value={values.unidade_id || ''} 
+                  onChange={(e) => {
+                    const selectedValue = Number(e.target.value);
+                    setFieldValue('unidade_id', selectedValue);
+                  }}
                   error={!!touched.unidade_id && !!errors.unidade_id}
-                  helperText={touched.unidade_id && errors.unidade_id}
                 />
               </Box>
 
@@ -232,18 +265,13 @@ const AddVaga = ({ onClose, onSuccess }) => {
                 >
                   Coordenador
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: João Silva"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('coordenador_id', true, false)}
-                  onChange={handleChange}
-                  value={values.coordenador_id}
-                  name="coordenador_id"
+                <CoordenadorDropdown
+                  value={values.coordenador_id || ''} 
+                  onChange={(e) => {
+                    const selectedValue = Number(e.target.value);
+                    setFieldValue('coordenador_id', selectedValue);
+                  }}
                   error={!!touched.coordenador_id && !!errors.coordenador_id}
-                  helperText={touched.coordenador_id && errors.coordenador_id}
                 />
               </Box>
 
@@ -284,20 +312,14 @@ const AddVaga = ({ onClose, onSuccess }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  Status
+                  Status da Vaga
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: 3"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('status_vaga_id', true, false)}
-                  onChange={handleChange}
-                  value={values.status_vaga_id}
-                  name="status_vaga_id"
+                <StatusVagaDropdown
+                  value={values.status_vaga_id || ''} 
+                  onChange={(e) => {
+                    setFieldValue('status_vaga_id', e.target.value);
+                  }}
                   error={!!touched.status_vaga_id && !!errors.status_vaga_id}
-                  helperText={touched.status_vaga_id && errors.status_vaga_id}
                 />
               </Box>
 

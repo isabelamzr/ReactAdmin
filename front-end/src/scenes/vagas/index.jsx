@@ -1,3 +1,5 @@
+// index.jsx
+
 import React, { useState, useEffect } from "react";
 import { Box, Button, Typography, Dialog, DialogContent } from "@mui/material";
 import { useTheme } from "@mui/material/styles";

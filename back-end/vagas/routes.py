@@ -1,4 +1,5 @@
 # routes.py
+
 from flask import Blueprint, request, jsonify
 from .database import (
     conectar_db,
@@ -12,15 +13,47 @@ from .database import (
 )
 
 vagas_routes = Blueprint('vagas', __name__, url_prefix='/vagas')
+status_routes = Blueprint('status_vaga', __name__, url_prefix='/status_vaga')
+
+# routes.py
+from flask import Blueprint, request, jsonify
+from .database import (
+    conectar_db,
+    criar_vaga,
+    obter_vagas,
+    atualizar_vaga,
+    soft_delete_vaga,
+    excluir_vaga_permanente,
+    restaurar_vaga,
+    listar_vagas_inativas
+)
+
+@status_routes.route('/read', methods=['GET'])
+def get_status():
+    conexao = conectar_db()
+    cursor = conexao.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT id, descricao FROM status_vaga")
+        status = cursor.fetchall()
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conexao.close()
 
 @vagas_routes.route('', methods=['POST'])
 def api_criar_vaga():
     try:
+        print("Método da requisição:", request.method)
+        print("Headers:", request.headers)
         dados = request.json
         conexao = conectar_db()
         return criar_vaga(conexao, dados)
     except Exception as e:
+        print("Erro na rota:", str(e))
         return jsonify({"message": f"Erro ao criar vaga: {e}"}), 500
+    
 @vagas_routes.route('/read', methods=['GET'])
 def api_obter_vagas():
     try:

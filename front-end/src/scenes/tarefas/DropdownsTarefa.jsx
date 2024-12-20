@@ -26,7 +26,7 @@ const CoordenadorDropdown = ({ value, onChange, error, helperText }) => {
             key={coordenador.id}
             value={coordenador.id}
           >
-            {coordenador.nome}
+            {coordenador.nome} 
           </MenuItem>
         ))}
       </Select>

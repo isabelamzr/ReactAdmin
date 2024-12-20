@@ -16,21 +16,40 @@ def conectar_db():
     except mysql.connector.Error as err:
         print(f"Erro ao conectar ao banco de dados: {err}")
         return None
+    
+def validar_candidatando(valor):
+    valores_validos = ['Sim', 'Já encaixado', 'Não']
+    if valor not in valores_validos:
+        raise ValueError("Valor inválido para candidatando")
+    return valor    
+
+def validar_termo_assinado(termo):
+    valores_validos = ['Sim', 'Não', 'Nulo']
+    if termo not in valores_validos:
+        raise ValueError("Valor inválido para termo_assinado")
+    return termo
 
 def criar_voluntario(conexao, dados):
     if not conexao:
         return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
 
+    try:
+        dados['termo_assinado'] = validar_termo_assinado(dados['termo_assinado'])
+        dados['candidatando'] = validar_candidatando(dados['candidatando'])
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 400
+    
     cursor = conexao.cursor()
     query = """
     INSERT INTO voluntarios 
-    (nome, telefone, email, endereco, habilidades_id, tarefa_id, unidade_id, observacoes, termo_assinado) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    (nome, telefone, email, endereco, habilidades_id, tarefa_id, unidade_id, observacoes, termo_assinado, candidatando) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     valores = (
         dados['nome'], dados['telefone'], dados['email'], 
         dados['endereco'], dados['habilidades_id'], dados['tarefa_id'], 
-        dados['unidade_id'], dados['observacoes'], dados['termo_assinado']
+        dados['unidade_id'], dados['observacoes'], dados['termo_assinado'],
+        dados['candidatando']
     )
 
     try:
@@ -63,18 +82,26 @@ def atualizar_voluntario(conexao, id, dados):
     if not conexao:
         return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
 
+    try:
+        if 'termo_assinado' in dados:
+            dados['termo_assinado'] = validar_termo_assinado(dados['termo_assinado'])
+        if 'candidatando' in dados:
+            dados['candidatando'] = validar_candidatando(dados['candidatando'])    
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 400
+    
     cursor = conexao.cursor()
     query = """
     UPDATE voluntarios 
     SET nome = %s, telefone = %s, email = %s, endereco = %s, 
     habilidades_id = %s, tarefa_id = %s, unidade_id = %s, 
-    observacoes = %s, termo_assinado = %s 
+    observacoes = %s, termo_assinado = %s, candidatando = %s  
     WHERE id = %s
     """
     valores = (
         dados['nome'], dados['telefone'], dados['email'], 
         dados['endereco'], dados['habilidades_id'], dados['tarefa_id'], 
-        dados['unidade_id'], dados['observacoes'], dados['termo_assinado'], id
+        dados['unidade_id'], dados['observacoes'], dados['termo_assinado'], dados['candidatando'], id
     )
 
     try:
@@ -138,3 +165,4 @@ def restaurar_voluntario(id, conexao):
         raise RuntimeError(f"Erro ao restaurar voluntário: {e}")
     finally:
         cursor.close()
+ 

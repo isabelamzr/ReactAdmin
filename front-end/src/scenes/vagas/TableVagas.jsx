@@ -1,3 +1,5 @@
+// TableVagas.jsx
+
 import React from 'react';
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box } from "@mui/material";

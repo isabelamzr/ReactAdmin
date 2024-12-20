@@ -11,8 +11,6 @@ import {
 import { Formik } from 'formik';
 import * as yup from 'yup';
 
-// removi .required("Campo obrigatório") para facilitar a logica de desenvolvimento, ver depois se volta
-
 const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)?[0-9]{4,5}[-]?[0-9]{4}$/;
 const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -25,7 +23,8 @@ const checkoutSchema = yup.object().shape({
   tarefa_id: yup.string(),
   unidade_id: yup.string(),
   observacoes: yup.string(),
-  termo_assinado: yup.string()
+  termo_assinado: yup.string(),
+  candidatando: yup.string()
 });
 
 const EditVoluntario = ({ 
@@ -49,7 +48,8 @@ const EditVoluntario = ({
             tarefa_id: voluntario?.tarefa_id || '',
             unidade_id: voluntario?.unidade_id || '',
             observacoes: voluntario?.observacoes || '',
-            termo_assinado: voluntario?.termo_assinado || ''
+            termo_assinado: voluntario?.termo_assinado || '',
+            candidatando: voluntario?.candidatando || '',
           }}
           validationSchema={checkoutSchema}
         >
@@ -177,6 +177,20 @@ const EditVoluntario = ({
                   name="termo_assinado"
                   error={!!touched.termo_assinado && !!errors.termo_assinado}
                   helperText={touched.termo_assinado && errors.termo_assinado}
+                  sx={{ gridColumn: "span 4" }}
+                />
+
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  type="text"
+                  label="Candidatando"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.candidatando}
+                  name="candidatando"
+                  error={!!touched.candidatando && !!errors.candidatando}
+                  helperText={touched.candidatando && errors.candidatando}
                   sx={{ gridColumn: "span 4" }}
                 />
               </Box>

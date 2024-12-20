@@ -24,6 +24,7 @@ const TableVoluntarios = ({
     { field: "unidade_nome", headerName: "Unidade", flex: 1 },
     { field: "observacoes", headerName: "Observações", flex: 1 },
     { field: "termo_assinado", headerName: "Termo-Assinado", flex: 1 },
+    { field: "candidatando", headerName: "Candidatando", flex: 1 },
     {
       field: "actions",
       headerName: "Editar",

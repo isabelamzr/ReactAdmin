@@ -9,7 +9,7 @@ import CoordenadorDropdown, {
   TipoTarefaDropdown, 
   UnidadeDropdown, 
   VoluntarioDropdown 
-} from "./DropdownsTarefa";
+} from "./DropdownsTarefa"; 
 
 const initialValues = {
   tipo_tarefa_id: "",

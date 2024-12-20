@@ -3,6 +3,12 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import HabilidadesDropdown, { 
+  TarefaDropdown, 
+  UnidadeDropdown, 
+  TermoAssinadoDropdown, 
+  CandidatandoDropdown 
+} from "./DropdownsVoluntarios";
 
 const initialValues = {
   nome: "",
@@ -14,21 +20,25 @@ const initialValues = {
   unidade_id: "",
   observacoes: "",
   termo_assinado: "",
+  candidatando: "",
 };
 
 const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)?[0-9]{4,5}[-]?[0-9]{4}$/;
 const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const checkoutSchema = yup.object().shape({
-  nome: yup.string(),
-  telefone: yup.string().matches(phoneRegExp, "Este número é inválido"),
-  email: yup.string().matches(emailRegExp, "Este e-mail é inválido"),
+  nome: yup.string().required("Nome é obrigatório"),
+  telefone: yup.string().matches(phoneRegExp, "Número inválido"),
+  email: yup.string().matches(emailRegExp, "E-mail inválido"),
   endereco: yup.string(),
   habilidades_id: yup.string(),
   tarefa_id: yup.string(),
   unidade_id: yup.string(),
   observacoes: yup.string(),
-  termo_assinado: yup.string(),
+  termo_assinado: yup.string()
+    .oneOf(['Sim', 'Não', 'Nulo'], "Valor inválido para termo assinado"),
+    candidatando: yup.string()
+  .oneOf(['Sim', 'Já encaixado', 'Não'], "Valor inválido para candidatando"),
 });
 
 const AddVoluntario = ({ onClose, onSuccess }) => {
@@ -48,9 +58,10 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
         onSuccess(data.message);
         onClose();
       } else {
-        throw new Error("Erro ao criar voluntário");
+        throw new Error(data.message || "Erro ao criar voluntário");
       }
     } catch (error) {
+      alert(error.message);
       onSuccess(error.message, "error");
     } finally {
       setSubmitting(false);
@@ -58,7 +69,7 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <Box p="20px">
+    <Box p="20px" sx={{ maxWidth: "600px", height: "90vh", overflowY: "auto" }}>
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -72,6 +83,7 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
           handleChange,
           handleSubmit,
           isSubmitting,
+          setFieldValue,
           setFieldTouched
         }) => (
           <form onSubmit={handleSubmit}>
@@ -147,7 +159,7 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  E-mail
+                  Email
                 </Typography>
                 <TextField
                   fullWidth
@@ -180,9 +192,9 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
                   fullWidth
                   variant="filled"
                   type="text"
-                  placeholder="Ex: Rua Herculano Pena, 481&#10;Nova Suissa"
                   multiline
                   rows={2}
+                  placeholder="Ex: Rua Herculano Pena, 481&#10;Nova Suissa"
                   onBlur={handleBlur}
                   onFocus={() => setFieldTouched('endereco', true, false)}
                   onChange={handleChange}
@@ -205,16 +217,9 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
                 >
                   Habilidades
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: Fisioterapeuta"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('habilidades_id', true, false)}
-                  onChange={handleChange}
+                <HabilidadesDropdown
                   value={values.habilidades_id}
-                  name="habilidades_id"
+                  onChange={(e) => setFieldValue('habilidades_id', e.target.value)}
                   error={!!touched.habilidades_id && !!errors.habilidades_id}
                   helperText={touched.habilidades_id && errors.habilidades_id}
                 />
@@ -232,16 +237,9 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
                 >
                   Tarefa
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: Passe de Tratamento"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('tarefa_id', true, false)}
-                  onChange={handleChange}
+                <TarefaDropdown
                   value={values.tarefa_id}
-                  name="tarefa_id"
+                  onChange={(e) => setFieldValue('tarefa_id', e.target.value)}
                   error={!!touched.tarefa_id && !!errors.tarefa_id}
                   helperText={touched.tarefa_id && errors.tarefa_id}
                 />
@@ -259,16 +257,9 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
                 >
                   Unidade
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: Casa de Etelvina"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('unidade_id', true, false)}
-                  onChange={handleChange}
+                <UnidadeDropdown
                   value={values.unidade_id}
-                  name="unidade_id"
+                  onChange={(e) => setFieldValue('unidade_id', e.target.value)}
                   error={!!touched.unidade_id && !!errors.unidade_id}
                   helperText={touched.unidade_id && errors.unidade_id}
                 />
@@ -292,9 +283,10 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
                   multiline
                   rows={4}
                   placeholder="Ex: Participação em reunião mediúnica nas noites durante a semana,
-                ou aos sábados em qualquer horário, como elemento de sustentação, pois ainda estou 
-                desenvolvendo minha mediunidade, tenho interesse em ser adepto de tais reuniões.&#10;&#10;
-                Estou no curso do MED2 na casa."
+                  ou aos sábados em qualquer horário, como elemento de sustentação, pois ainda estou 
+                  desenvolvendo minha mediunidade, tenho interesse em ser adepto de tais reuniões.
+                  
+                  Estou no curso do MED2 na casa."
                   onBlur={handleBlur}
                   onFocus={() => setFieldTouched('observacoes', true, false)}
                   onChange={handleChange}
@@ -315,23 +307,37 @@ const AddVoluntario = ({ onClose, onSuccess }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  Termo-Assinado
+                  Termo Assinado
                 </Typography>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  placeholder="Ex: Sim/Não"
-                  onBlur={handleBlur}
-                  onFocus={() => setFieldTouched('termo_assinado', true, false)}
-                  onChange={handleChange}
+                <TermoAssinadoDropdown
                   value={values.termo_assinado}
-                  name="termo_assinado"
+                  onChange={(e) => setFieldValue('termo_assinado', e.target.value)}
                   error={!!touched.termo_assinado && !!errors.termo_assinado}
                   helperText={touched.termo_assinado && errors.termo_assinado}
                 />
               </Box>
             </Box>
+
+            <Box sx={{ gridColumn: "span 2" }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mb: 1, 
+                    color: 'text.secondary', 
+                    fontSize: touched.candidatando ? '0.8rem' : '1rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Candidatando
+                </Typography>
+                <CandidatandoDropdown
+                  value={values.candidatando}
+                  onChange={(e) => setFieldValue('candidatando', e.target.value)}
+                  error={!!touched.candidatando && !!errors.candidatando}
+                  helperText={touched.candidatando && errors.candidatando}
+                />
+              </Box>
+
             <Box display="flex" justifyContent="end" mt="20px">
               <Button 
                 type="submit" 
