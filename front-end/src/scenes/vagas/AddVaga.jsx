@@ -9,7 +9,7 @@ import CoordenadorDropdown, {
   UnidadeDropdown, 
   TipoTarefaDropdown, 
   StatusVagaDropdown 
-} from "./DropdownsVagas";
+} from "./AddDropdowns";
 
 const initialValues = {
   tarefa_id: "",
