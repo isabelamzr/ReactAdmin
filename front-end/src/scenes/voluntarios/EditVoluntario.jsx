@@ -1,15 +1,8 @@
 import React from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
-  TextField, 
-  Box 
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box } from "@mui/material";
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import { HabilidadesDropdown, TarefaDropdown, UnidadeDropdown, TermoAssinadoDropdown, CandidatandoDropdown } from './EditDropdowns';
 
 const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)?[0-9]{4,5}[-]?[0-9]{4}$/;
 const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,12 +20,7 @@ const checkoutSchema = yup.object().shape({
   candidatando: yup.string()
 });
 
-const EditVoluntario = ({ 
-  open, 
-  onClose, 
-  voluntario, 
-  onSubmit 
-}) => {
+const EditVoluntario = ({ open, onClose, voluntario, onSubmit }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Editar Voluntário</DialogTitle>
@@ -53,15 +41,7 @@ const EditVoluntario = ({
           }}
           validationSchema={checkoutSchema}
         >
-          {({ 
-            values, 
-            errors, 
-            touched, 
-            handleBlur, 
-            handleChange, 
-            handleSubmit,
-            isSubmitting 
-          }) => (
+          {({ values, errors, touched, handleBlur, handleChange, handleSubmit, isSubmitting, setFieldValue }) => (
             <form onSubmit={handleSubmit}>
               <Box display="grid" gap="30px" gridTemplateColumns="repeat(4, minmax(0, 1fr))">
                 <TextField
@@ -116,95 +96,61 @@ const EditVoluntario = ({
                   helperText={touched.endereco && errors.endereco}
                   sx={{ gridColumn: "span 4" }}
                 />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Habilidades"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.habilidades_id}
-                  name="habilidades_id"
-                  error={!!touched.habilidades_id && !!errors.habilidades_id}
-                  helperText={touched.habilidades_id && errors.habilidades_id}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Tarefa"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.tarefa_id}
-                  name="tarefa_id"
-                  error={!!touched.tarefa_id && !!errors.tarefa_id}
-                  helperText={touched.tarefa_id && errors.tarefa_id}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Unidade"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.unidade_id}
-                  name="unidade_id"
-                  error={!!touched.unidade_id && !!errors.unidade_id}
-                  helperText={touched.unidade_id && errors.unidade_id}
-                  sx={{ gridColumn: "span 4" }}
-                />
+                <Box sx={{ gridColumn: "span 4" }}>
+                  <HabilidadesDropdown
+                    value={values.habilidades_id}
+                    onChange={(e) => setFieldValue('habilidades_id', e.target.value)}
+                    error={!!touched.habilidades_id && !!errors.habilidades_id}
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "span 4" }}>
+                  <TarefaDropdown
+                    value={values.tarefa_id}
+                    onChange={(e) => setFieldValue('tarefa_id', e.target.value)}
+                    error={!!touched.tarefa_id && !!errors.tarefa_id}
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "span 4" }}>
+                  <UnidadeDropdown
+                    value={values.unidade_id}
+                    onChange={(e) => setFieldValue('unidade_id', e.target.value)}
+                    error={!!touched.unidade_id && !!errors.unidade_id}
+                  />
+                </Box>
                 <TextField
                   fullWidth
                   variant="filled"
                   type="text"
                   label="Observações"
+                  multiline
+                  rows={4}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.observacoes}
                   name="observacoes"
                   sx={{ gridColumn: "span 4" }}
                 />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Termo Assinado"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.termo_assinado}
-                  name="termo_assinado"
-                  error={!!touched.termo_assinado && !!errors.termo_assinado}
-                  helperText={touched.termo_assinado && errors.termo_assinado}
-                  sx={{ gridColumn: "span 4" }}
-                />
-
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Candidatando"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.candidatando}
-                  name="candidatando"
-                  error={!!touched.candidatando && !!errors.candidatando}
-                  helperText={touched.candidatando && errors.candidatando}
-                  sx={{ gridColumn: "span 4" }}
-                />
+                <Box sx={{ gridColumn: "span 4" }}>
+                  <TermoAssinadoDropdown
+                    value={values.termo_assinado}
+                    onChange={(e) => setFieldValue('termo_assinado', e.target.value)}
+                    error={!!touched.termo_assinado && !!errors.termo_assinado}
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "span 4" }}>
+                  <CandidatandoDropdown
+                    value={values.candidatando}
+                    onChange={(e) => setFieldValue('candidatando', e.target.value)}
+                    error={!!touched.candidatando && !!errors.candidatando}
+                  />
+                </Box>
               </Box>
 
               <DialogActions>
                 <Button onClick={onClose} color="secondary">
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
-                  color="primary" 
-                  variant="contained"
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" color="primary" variant="contained" disabled={isSubmitting}>
                   Salvar
                 </Button>
               </DialogActions>
