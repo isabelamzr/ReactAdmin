@@ -1,5 +1,3 @@
-# routes.py
-
 from flask import Blueprint, request, jsonify
 from .database import (
     conectar_db,
@@ -14,19 +12,6 @@ from .database import (
 
 vagas_routes = Blueprint('vagas', __name__, url_prefix='/vagas')
 status_routes = Blueprint('status_vaga', __name__, url_prefix='/status_vaga')
-
-# routes.py
-from flask import Blueprint, request, jsonify
-from .database import (
-    conectar_db,
-    criar_vaga,
-    obter_vagas,
-    atualizar_vaga,
-    soft_delete_vaga,
-    excluir_vaga_permanente,
-    restaurar_vaga,
-    listar_vagas_inativas
-)
 
 @status_routes.route('/read', methods=['GET'])
 def get_status():

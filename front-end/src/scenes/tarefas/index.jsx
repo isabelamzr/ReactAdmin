@@ -1,9 +1,10 @@
+// index.jsx , codigo antigo
+
 import React, { useState, useEffect } from "react";
 import { Box, Button, Typography, Dialog, DialogContent } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
 
-// Importações dos componentes
 import DeleteHistoryModal from "./DeleteHistoryModal";
 import EditTarefa from "./EditTarefa";
 import MessageNotification from "./MessageNotification";
@@ -15,24 +16,20 @@ const Tarefas = () => {
   const colors = tokens(theme.palette.mode);
   const URL_KEY = "http://localhost:5000/tarefas";
  
-  // Estados
   const [tarefas, setTarefas] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [deletedRecords, setDeletedRecords] = useState([]);
   const [canRestore, setCanRestore] = useState(false);
 
-  // Estados para modais e mensagens
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openHistoryModal, setOpenHistoryModal] = useState(false);
   const [selectedTarefa, setSelectedTarefa] = useState(null);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   
-  // Estados de mensagens
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
   const [messageVisible, setMessageVisible] = useState(false);
 
-  // Fetch methods
   const fetchTarefas = async () => {
     try {
       const response = await fetch(`${URL_KEY}/read`);

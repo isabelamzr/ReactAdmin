@@ -1,5 +1,3 @@
-# database.py 
-
 import mysql.connector
 import os
 from dotenv import load_dotenv
@@ -27,7 +25,6 @@ def criar_tarefa(conexao, dados):
     cursor = conexao.cursor(dictionary=True)
 
     try:
-        # Debug: Imprimir todos os dados antes da conversão
         print("Convertendo tipo_tarefa")
         if isinstance(dados['tipo_tarefa_id'], str):
             cursor.execute("SELECT id FROM tipo_tarefa WHERE nome_tarefa = %s", (dados['tipo_tarefa_id'],))
@@ -55,7 +52,6 @@ def criar_tarefa(conexao, dados):
                 return jsonify({"message": f"Voluntário não encontrado: {dados['voluntario_id']}"}), 400
             dados['voluntario_id'] = voluntario['id']
 
-        # Validação dos campos obrigatórios
         campos_obrigatorios = ['tipo_tarefa_id', 'dia', 'horario', 'coordenador_id', 'unidade_id', 'voluntario_id', 'local']
         for campo in campos_obrigatorios:
             if campo not in dados or not dados[campo]:

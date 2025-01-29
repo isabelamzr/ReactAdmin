@@ -1,5 +1,3 @@
-# app.py back-end
-
 from flask import Flask
 from flask_cors import CORS
 from coordenadores.routes import coordenadores_routes

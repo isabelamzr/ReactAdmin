@@ -1,5 +1,3 @@
-# routes.py
-
 from flask import Blueprint, request, jsonify
 from .database import (
     conectar_db,

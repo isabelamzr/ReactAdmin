@@ -1,41 +1,40 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
-import { tokens } from "../../theme";
+import { tokens } from "../theme";
 
-/* ICONS */
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined"; // home
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
-import AssignmentIcon from '@mui/icons-material/Assignment'; // tipo tarefa
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn'; // vagas
-import GroupAddIcon from '@mui/icons-material/GroupAdd'; // Vagas form
+import AssignmentIcon from '@mui/icons-material/Assignment'; 
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn'; 
 import GroupIcon from '@mui/icons-material/Group';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
-import PostAddIcon from '@mui/icons-material/PostAdd';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
+
   return (
     <MenuItem
       active={selected === title}
-      style={{
-        color: colors.grey[100],
+      style={{ color: colors.grey[100] }}
+      onClick={() => {
+        setSelected(title)
+        navigate(to);
       }}
-      onClick={() => setSelected(title)}
       icon={icon}
     >
       <Typography>{title}</Typography>
-      <Link to={to} />
     </MenuItem>
   );
 };
@@ -68,7 +67,7 @@ const Sidebar = () => {
     >
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
-          {/* LOGO AND MENU ICON */}
+         
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
@@ -132,7 +131,6 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
 
-            {/* Condicional para desaparecer ou substituir os títulos */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -149,7 +147,6 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
 
-
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -160,21 +157,22 @@ const Sidebar = () => {
 
             <Item
               title="Tarefas"
-              to="/tarefas"
+              to="/tasks"
               icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
             />
+            
             <Item
               title="Voluntários"
-              to="/voluntarios"
+              to="/volunteers"
               icon={<GroupIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Coordenadores"
-              to="/coordenadores"
+              to="/coordinators"
               icon={<PeopleOutlineIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -182,43 +180,11 @@ const Sidebar = () => {
 
             <Item
               title="Vagas"
-              to="/vagas"
+              to="/spots"
               icon={<ImportContactsIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              {isCollapsed ? "Form" : "Formulários"}
-            </Typography>
-
-            <Item
-              title="Vagas"
-              to="/formVagas"
-              icon={<PostAddIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Voluntários"
-              to="/formVoluntarios"
-              icon={<GroupAddIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Add Coordenadores"
-              to="/formCoordenadores"
-              icon={<GroupAddIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            {/* TABELAS DE DOMÍNIO */}
 
             <Typography
               variant="h6"
@@ -230,7 +196,7 @@ const Sidebar = () => {
 
             <Item
               title="Unidade"
-              to="/unidade"
+              to="/units"
               icon={<HomeWorkIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -238,7 +204,7 @@ const Sidebar = () => {
 
             <Item
               title="Status Vagas"
-              to="/statusVagas"
+              to="/spotStatus"
               icon={<AssignmentTurnedInIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -246,7 +212,7 @@ const Sidebar = () => {
 
             <Item
               title="Tipo Tarefa"
-              to="/tipoTarefa"
+              to="/tasksTypes"
               icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -254,7 +220,7 @@ const Sidebar = () => {
 
             <Item
               title="Habilidades"
-              to="/habilidades"
+              to="/skills"
               icon={<EmojiObjectsIcon />}
               selected={selected}
               setSelected={setSelected}
