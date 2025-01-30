@@ -1,4 +1,4 @@
-const transformers = {
+export const transformers = {
     task: {
        requiredFields : [
         'taskNameView',
@@ -217,23 +217,3 @@ const transformers = {
   const getUpdateInfo = (values) => (
     values.id ? { id: values.id } : {}
   );
-  
-  export const transform = (data, type, direction) => {
-    if (!transformers[type]) {
-      throw new Error(`Invalid transformation: type "${type}" not found`);
-    }
-    
-    const transformer = transformers[type][direction];
-    if (!transformer) {
-      throw new Error(`Invalid transformation: direction "${direction}" not found for type "${type}"`);
-    }
-     return Array.isArray(data) ? data.map(transformer) : transformer(data);
-  };
-  
-  export const getRequiredFields = (type) => {
-    if (!transformers[type]) {
-      throw new Error(`Invalid entity type: "${type}"`);
-    }
-    return transformers[type].requiredFields;
-  };
-  

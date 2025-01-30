@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
-import { AddModal } from '../Modals/AddModal';
+import AddModal from '../Modals/AddModal';
 import { useTheme } from '@mui/material';
 import { tokens } from '../../theme';
+import { validateEntityType } from '../../utils/entityTypes';
 
 
 export const GridActions = ({ services, onSuccess, entityType }) => {
+  
+  validateEntityType(entityType);
   
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);

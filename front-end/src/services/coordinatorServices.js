@@ -10,7 +10,7 @@ import {
   ErrorRestoreMsg,
   ErrorPermanentDeleteMsg
 } from '../components/Notification/MessageNotification';
-import { transform } from '../utils/dataTransformer';
+import { transform } from '../utils/entityTypes'
 
 const BASE_URL = 'http://localhost:5000/coordenadores';
 

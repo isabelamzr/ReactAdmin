@@ -3,7 +3,7 @@ import { taskTypeServices } from '../../services/taskTypeServices';
 import { coordinatorServices } from '../../services/coordinatorServices';
 import { unitServices } from '../../services/unitServices';
 import { volunteerServices } from '../../services/volunteerServices';
-import { getRequiredFields } from '../../utils/dataTransformer';
+import { getRequiredFields } from '../../utils/entityTypes';
 
 export const taskColumns = {
   mainColumn: 'taskType',

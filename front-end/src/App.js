@@ -12,9 +12,9 @@ const Volunteers = lazy(() => import('./screens/Volunteers'));
 const Coordinators = lazy(() => import('./screens/Coordinators'));
 const TaskTypes = lazy(() => import('./screens/TasksTypes'));
 const Units = lazy(() => import('./screens/Units'));
-const Spots = lazy(() => import('./screens/Spots'));
-const Skills = lazy(() => import('./screens/Skills'));
-const SpotStatus = lazy(() => import('./screens/SpotStatus'));
+// const Spots = lazy(() => import('./screens/Spots'));
+// const Skills = lazy(() => import('./screens/Skills'));
+// const SpotStatus = lazy(() => import('./screens/SpotStatus'));
 const Dashboard = lazy(() => import('./screens/Dashboard'));
 const Users = lazy(() => import('./screens/Users'));
 const Calendar = lazy(() => import('./screens/Calendar'));
@@ -65,9 +65,9 @@ function App() {
             <Route path="/coordinators" element={<Coordinators />} /> 
             <Route path="/tasksTypes" element={<TaskTypes />} /> 
             <Route path="/units" element={<Units />} /> 
-            <Route path="/spots" element={<Spots />} />  
+            {/* <Route path="/spots" element={<Spots />} />  
             <Route path="/skills" element={<Skills />} /> 
-            <Route path="/spotStatus" element={<SpotStatus />} /> 
+            <Route path="/spotStatus" element={<SpotStatus />} />  */}
             <Route path="/calendar" element={<Calendar />} />            
           </Routes>
           </Suspense>
