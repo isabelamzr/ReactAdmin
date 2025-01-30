@@ -6,10 +6,10 @@ import { volunteerServices } from '../../services/volunteerServices';
 import { getRequiredFields } from '../../utils/entityTypes';
 
 export const taskColumns = {
-  mainColumn: 'taskType',
+  mainColumn: 'taskID',
   columns: [
     {
-      field: "taskType",
+      field: "taskNameView",
       headerName: "Tarefa",
       flex: 1,
       editable: true,
