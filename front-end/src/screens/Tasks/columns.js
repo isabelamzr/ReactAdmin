@@ -76,3 +76,5 @@ export const getVisibleColumns = (entityType, columns) => {
   const requiredFields = getRequiredFields(entityType); 
   return columns.filter(col => requiredFields.includes(col.field)); 
 };
+
+
