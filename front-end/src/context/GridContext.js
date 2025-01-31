@@ -1,5 +1,4 @@
 import { createContext, useContext } from 'react';
-
 const GridContext = createContext();
 
 export const GridProvider = ({ children, columns, mainColumn }) => {

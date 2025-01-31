@@ -4,12 +4,11 @@ import AddModal from '../Modals/AddModal';
 import { useTheme } from '@mui/material';
 import { tokens } from '../../theme';
 import { validateEntityType } from '../../utils/entityTypes';
-
+import { useGridContext } from '../../context/GridContext';
 
 export const GridActions = ({ services, onSuccess, entityType }) => {
-  
+  const { columns } = useGridContext();
   validateEntityType(entityType);
-  
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [openAdd, setOpenAdd] = useState(false);
@@ -43,6 +42,7 @@ export const GridActions = ({ services, onSuccess, entityType }) => {
         onClose={() => setOpenAdd(false)}
         onSubmit={handleAdd}
         entityType={entityType}
+        columns={columns}
       />
     </Box>
   );

@@ -18,10 +18,10 @@ import MessageNotification from '../Notification/MessageNotification';
 import { validateEntityType, getEntityDefinition, transform } from '../../utils/entityTypes';
 import { getVisibleColumns } from '../../screens/Tasks/columns';
 
-  const AddModal = ({ open, onClose, onSubmit, entityType }) => {
+  const AddModal = ({ open, onClose, onSubmit, entityType, columns }) => {
   validateEntityType(entityType);
   const entityDef = getEntityDefinition(entityType);
-  const columns = getVisibleColumns(entityType);
+  const visibleColumns = getVisibleColumns(entityType, columns);
   const { requiredFields } = entityDef;
 
   const [message, setMessage] = useState({ text: '', type: '', visible: false });
@@ -30,7 +30,7 @@ import { getVisibleColumns } from '../../screens/Tasks/columns';
   useEffect(() => {
     const fetchOptions = async () => {
       const options = {};
-      for (let column of columns) {
+      for (let column of visibleColumns) {
         if (column.getOptions) {
           options[column.field] = await column.getOptions();
         }
@@ -38,7 +38,7 @@ import { getVisibleColumns } from '../../screens/Tasks/columns';
       setColumnOptions(options);
     };
     fetchOptions();
-  }, [columns]);
+  }, [visibleColumns]);
 
   const validationSchema = yup.object().shape(
     columns.reduce((acc, col) => {

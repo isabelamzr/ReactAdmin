@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Box } from '@mui/material';
 import { GridDefault} from '../../components/Grid/GridDefault'
 import { GridActions } from '../../components/Grid/GridActions';
@@ -8,7 +8,7 @@ import MessageNotification from '../../components/Notification/MessageNotificati
 import { useGridContext } from '../../context/GridContext';
 
 const TasksContent = () => {
-  const { columns } = useGridContext();  
+  const { columns } = useGridContext();
   const [data, setData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [message, setMessage] = useState({
@@ -16,6 +16,17 @@ const TasksContent = () => {
     type: '',
     visible: false
   });
+
+  const handleMessage = useCallback((text, type) => {
+    setMessage({
+      text,
+      type: type || 'success',
+      visible: true
+    });
+    setTimeout(() => {
+      setMessage({ text: '', type: '', visible: false });
+    }, 3000);
+  }, []);
 
   const fetchData = useCallback(async () => {
     const result = await taskServices.getAll();
@@ -25,30 +36,29 @@ const TasksContent = () => {
     }
   }, []);
 
-  const handleMessage = useCallback((text, type) => {
-    setMessage({
-      text,
-      type: type || 'success',
-      visible: true
-    });
-
-    setTimeout(() => {
-      setMessage({ text: '', type: '', visible: false });
-    }, 3000);
-  }, []);
-
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (selectedRows.length === 0) return;
-
     const taskToDelete = data.find(task => task.id === selectedRows[0]);
-    const result = await taskServices.delete(selectedRows[0], taskToDelete.taskName); 
+    const result = await taskServices.delete(selectedRows[0], taskToDelete.taskName);
     
     handleMessage(result.message, result.success ? 'delete' : 'error');
     
     if (result.success) {
       await fetchData();
     }
-  };
+  }, [selectedRows, data, fetchData, handleMessage]);
+
+  const memoizedMessageNotification = useMemo(() => (
+    message.visible && (
+      <Box mb="20px" display="flex" justifyContent="center" width="100%">
+        <MessageNotification 
+          message={message.text}
+          type={message.type}
+          visible={message.visible}
+        />
+      </Box>
+    )
+  ), [message]);
 
   useEffect(() => {
     fetchData();
@@ -56,15 +66,7 @@ const TasksContent = () => {
 
   return (
     <Box m="20px" position="relative">
-      {message.visible && (
-        <Box mb="20px" display="flex" justifyContent="center" width="100%">
-          <MessageNotification 
-            message={message.text}
-            type={message.type}
-            visible={message.visible}
-          />
-        </Box>
-      )}
+      {memoizedMessageNotification}
       
       <GridActions 
         services={taskServices}
@@ -90,4 +92,4 @@ const TasksContent = () => {
   );
 };
 
-export default TasksContent;
+export default memo(TasksContent);
