@@ -3,9 +3,10 @@ import os
 from dotenv import load_dotenv
 from flask import jsonify
 
+
 load_dotenv()
 
-def conectar_db():
+def connect_db():
     try:
         return mysql.connector.connect(
             host=os.getenv("DB_HOST"),
@@ -14,12 +15,12 @@ def conectar_db():
             database=os.getenv("DB_NAME")
         )
     except mysql.connector.Error as err:
-        print(f"Erro ao conectar ao banco de dados: {err}")
+        print(f"Unable to connect database: {err}")
         return None
 
-def criar_habilidade(conexao, dados):
+def create_skill(conexao, dados):
     if not conexao:
-        return jsonify({"message": "Erro ao conectar ao banco"}), 500
+        return jsonify({"message": "Unable to connect database"}), 500
 
     cursor = conexao.cursor()
     query = "INSERT INTO habilidades (descricao, talentos) VALUES (%s, %s)"
@@ -28,16 +29,16 @@ def criar_habilidade(conexao, dados):
     try:
         cursor.execute(query, valores)
         conexao.commit()
-        return jsonify({"message": "Habilidade criada com sucesso!"}), 201
+        return jsonify({"message": "Skill created successfully!"}), 201
     except Exception as e:
-        return jsonify({"message": f"Erro ao criar habilidade: {str(e)}"}), 500
+        return jsonify({"message": f"Failed to create skill: {str(e)}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def obter_habilidades(conexao):
+def get_skills(conexao):
     if conexao is None:
-        return jsonify({"error": "Erro ao conectar ao banco de dados"}), 500
+        return jsonify({"error": "Unable to connect database"}), 500
 
     try:
         cursor = conexao.cursor(dictionary=True)
@@ -46,14 +47,14 @@ def obter_habilidades(conexao):
         resultado = cursor.fetchall()
         return resultado
     except Exception as e:
-        return jsonify({"error": f"Erro ao executar a consulta SQL: {e}"}), 500
+        return jsonify({"error": f"Error executing the SQL query: {e}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def atualizar_habilidade(conexao, id, dados):
+def update_skill(conexao, id, dados):
     if not conexao:
-        return jsonify({"message": "Erro ao conectar ao banco"}), 500
+        return jsonify({"message": "Unable to connect to the database"}), 500
 
     cursor = conexao.cursor()
     query = "UPDATE habilidades SET descricao = %s, talentos = %s WHERE id = %s"
@@ -62,17 +63,17 @@ def atualizar_habilidade(conexao, id, dados):
     try:
         cursor.execute(query, valores)
         conexao.commit()
-        return jsonify({"message": "Habilidade atualizada com sucesso!"})
+        return jsonify({"message": "Skill updated successfully!"})
     except Exception as e:
-        return jsonify({"message": f"Erro ao atualizar habilidade: {e}"}), 500
+        return jsonify({"message": f"Failed to update coordinator: {e}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def soft_delete_habilidade(id):
-    conexao = conectar_db()
+def soft_delete_skill(id):
+    conexao = connect_db()
     if not conexao:
-        return jsonify({"message": "Erro ao conectar ao banco"}), 500
+        return jsonify({"message": "Unable to connect to the database"}), 500
 
     cursor = conexao.cursor()
     query = "UPDATE habilidades SET ativo = 0 WHERE id = %s"
@@ -80,14 +81,14 @@ def soft_delete_habilidade(id):
     try:
         cursor.execute(query, (id,))
         conexao.commit()
-        return jsonify({"message": "Habilidade marcada como excluída com sucesso!"}), 200
+        return jsonify({"message": "Skill marked successfully as deleted!"}), 200
     except Exception as e:
-        return jsonify({"message": f"Erro ao marcar habilidade como excluída: {e}"}), 500
+        return jsonify({"message": f"Failed to mark skill as deleted: {e}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def excluir_habilidade_permanente(conexao, id):
+def delete_skill_permanently(conexao, id):
     try:
         with conexao.cursor() as cursor:
             cursor.execute("DELETE FROM habilidades WHERE id = %s", (id,))
@@ -95,20 +96,20 @@ def excluir_habilidade_permanente(conexao, id):
             return True
     except Exception as e:
         conexao.rollback()
-        raise ValueError(f"Erro ao excluir habilidade: {e}")
+        raise ValueError(f"Error permanently deleting skill: {e}")
 
-def listar_habilidades_inativas(conexao):
+def show_inactive_skills(conexao):
     try:
         with conexao.cursor(dictionary=True) as cursor:
             query = "SELECT * FROM habilidades WHERE ativo = 0"
             cursor.execute(query)
             return cursor.fetchall()
     except Exception as e:
-        raise ValueError(f"Erro ao listar habilidades inativas: {e}")
+        raise ValueError(f"Failed to list inactive skills: {e}")
 
-def restaurar_habilidade(id, conexao):
+def restore_skill(id, conexao):
     if not conexao:
-        raise ValueError("Erro ao conectar ao banco de dados.")
+        raise ValueError("Unable to connect database.")
     
     cursor = conexao.cursor()
     query = "UPDATE habilidades SET ativo = 1 WHERE id = %s"
@@ -117,6 +118,6 @@ def restaurar_habilidade(id, conexao):
         cursor.execute(query, (id,))
         conexao.commit()
     except Exception as e:
-        raise RuntimeError(f"Erro ao restaurar habilidade: {e}")
+        raise RuntimeError(f"Failed to restore skill: {e}")
     finally:
       cursor.close()

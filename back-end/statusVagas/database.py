@@ -14,12 +14,12 @@ def conectar_db():
             database=os.getenv("DB_NAME")
         )
     except mysql.connector.Error as err:
-        print(f"Erro ao conectar ao banco de dados: {err}")
+        print(f"Unable to connect database: {err}")
         return None
 
 def criar_status_vaga(conexao, dados):
     if not conexao:
-        return jsonify({"message": "Erro ao conectar ao banco"}), 500
+        return jsonify({"message": "Unable to connect database"}), 500
 
     cursor = conexao.cursor()
     query = "INSERT INTO status_vaga (codigo_status, descricao) VALUES (%s, %s)"

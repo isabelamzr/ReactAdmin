@@ -12,7 +12,7 @@ import {
 } from '../components/Notification/MessageNotification';
 import { transform } from '../utils/entityTypes'
 
-const BASE_URL = 'http://localhost:5000/coordenadores';
+const BASE_URL = 'http://localhost:5000/coordinators';
 
 export const coordinatorServices = {
   getAll: async () => {

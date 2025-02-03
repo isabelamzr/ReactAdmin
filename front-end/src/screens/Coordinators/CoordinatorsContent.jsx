@@ -5,7 +5,7 @@ import { GridActions } from '../../components/Grid/GridActions';
 import { GridFooterActions } from '../../components/Grid/GridFooterActions';
 import { coordinatorServices } from '../../services/coordinatorServices';
 import MessageNotification from '../../components/Notification/MessageNotification';
-import { useGridContext } from '../../context/GridContext';
+import { useGridContext } from '../../hooks/useGridContext';
 
 const CoordinatorsContent = () => {
   const { columns } = useGridContext();

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box } from "@mui/material";
 import { tokens } from "../../theme";
 import { useTheme } from "@mui/material";
-import { useGridContext } from '../../context/GridContext';
+import { useGridContext } from '../../hooks/useGridContext';
 import MessageNotification from '../Notification/MessageNotification';
 
 const DeleteHistoryModal = ({ open, onClose, deletedRecords = [], services, onSuccess }) => {

@@ -5,7 +5,7 @@ from flask import jsonify
 
 load_dotenv()
 
-def conectar_db():
+def connect_db():
     try:
         return mysql.connector.connect(
             host=os.getenv("DB_HOST"),
@@ -14,12 +14,12 @@ def conectar_db():
             database=os.getenv("DB_NAME")
         )
     except mysql.connector.Error as err:
-        print(f"Erro ao conectar ao banco de dados: {err}")
+        print(f"Unable to connect to the database: {err}")
         return None
 
-def criar_coordenador(conexao, dados):
+def create_coordinator(conexao, dados):
     if not conexao:
-        return jsonify({"message": "Erro ao conectar ao banco"}), 500
+        return jsonify({"message": "Unable to connect to the database"}), 500
 
     cursor = conexao.cursor()
     query = "INSERT INTO coordenador (nome, telefone, email, genero) VALUES (%s, %s, %s, %s)"
@@ -28,16 +28,16 @@ def criar_coordenador(conexao, dados):
     try:
         cursor.execute(query, valores)
         conexao.commit()
-        return jsonify({"message": "Coordenador criado com sucesso!"}), 201
+        return jsonify({"message": "Coordinator created successfully!"}), 201
     except Exception as e:
-        return jsonify({"message": f"Erro ao criar coordenador: {str(e)}"}), 500
+        return jsonify({"message": f"Failed to create coordinator: {str(e)}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def obter_coordenadores(conexao):
+def get_coordinators(conexao):
     if conexao is None:
-        return jsonify({"error": "Erro ao conectar ao banco de dados"}), 500
+        return jsonify({"error": "Unable to connect to the database"}), 500
 
     try:
         cursor = conexao.cursor(dictionary=True)
@@ -46,14 +46,14 @@ def obter_coordenadores(conexao):
         resultado = cursor.fetchall()
         return resultado
     except Exception as e:
-        return jsonify({"error": f"Erro ao executar a consulta SQL: {e}"}), 500
+        return jsonify({"error": f"Error executing the SQL query: {e}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def atualizar_coordenador(conexao, id, dados):
+def update_coordinator(conexao, id, dados):
     if not conexao:
-        return jsonify({"message": "Erro ao conectar ao banco"}), 500
+        return jsonify({"message": "Unable to connect to the database"}), 500
 
     cursor = conexao.cursor()
     query = "UPDATE coordenador SET nome = %s, telefone = %s, email = %s, genero = %s WHERE id = %s"
@@ -62,17 +62,17 @@ def atualizar_coordenador(conexao, id, dados):
     try:
         cursor.execute(query, valores)
         conexao.commit()
-        return jsonify({"message": "Coordenador atualizado com sucesso!"})
+        return jsonify({"message": "Coordinator updated successfully!"})
     except Exception as e:
-        return jsonify({"message": f"Erro ao atualizar coordenador: {e}"}), 500
+        return jsonify({"message": f"Failed to update coordinator: {e}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def soft_delete_coordenador(id):
-    conexao = conectar_db()
+def soft_delete_coordinator(id):
+    conexao = connect_db()
     if not conexao:
-        return jsonify({"message": "Erro ao conectar ao banco"}), 500
+        return jsonify({"message": "Unable to connect to the database"}), 500
 
     cursor = conexao.cursor()
     query = "UPDATE coordenador SET ativo = 0 WHERE id = %s"
@@ -80,14 +80,14 @@ def soft_delete_coordenador(id):
     try:
         cursor.execute(query, (id,))
         conexao.commit()
-        return jsonify({"message": "Coordenador marcado como excluído com sucesso!"}), 200
+        return jsonify({"message": "Successfully marked coordinator as deleted!"}), 200
     except Exception as e:
-        return jsonify({"message": f"Erro ao marcar coordenador como excluído: {e}"}), 500
+        return jsonify({"message": f"Failed to mark coordinator as deleted: {e}"}), 500
     finally:
         cursor.close()
         conexao.close()
 
-def excluir_coordenador_permanente(conexao, id):
+def delete_coordinator_permanently(conexao, id):
     try:
         with conexao.cursor() as cursor:
             cursor.execute("DELETE FROM coordenador WHERE id = %s", (id,))
@@ -95,20 +95,20 @@ def excluir_coordenador_permanente(conexao, id):
             return True
     except Exception as e:
         conexao.rollback()
-        raise ValueError(f"Erro ao excluir coordenador: {e}")
+        raise ValueError(f"Error permanently deleting coordinator: {e}")
 
-def listar_coordenadores_inativos(conexao):
+def show_inactive_coordinators(conexao):
     try:
         with conexao.cursor(dictionary=True) as cursor:
             query = "SELECT * FROM coordenador WHERE ativo = 0"
             cursor.execute(query)
             return cursor.fetchall()
     except Exception as e:
-        raise ValueError(f"Erro ao listar coordenadores inativos: {e}")
+        raise ValueError(f"Failed to list inactive coordinators: {e}")
 
-def restaurar_coordenador(id, conexao):
+def restore_coordinator(id, conexao):
     if not conexao:
-        raise ValueError("Erro ao conectar ao banco de dados.")
+        raise ValueError("Unable to connect to the database.")
     
     cursor = conexao.cursor()
     query = "UPDATE coordenador SET ativo = 1 WHERE id = %s"
@@ -117,6 +117,6 @@ def restaurar_coordenador(id, conexao):
         cursor.execute(query, (id,))
         conexao.commit()
     except Exception as e:
-        raise RuntimeError(f"Erro ao restaurar coordenador: {e}")
+        raise RuntimeError(f"Failed to restore coordinator: {e}")
     finally:
       cursor.close()

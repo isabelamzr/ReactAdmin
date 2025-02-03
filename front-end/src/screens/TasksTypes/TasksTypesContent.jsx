@@ -5,7 +5,7 @@ import { GridActions } from '../../components/Grid/GridActions';
 import { GridFooterActions } from '../../components/Grid/GridFooterActions';
 import { taskTypeServices } from '../../services/taskTypeServices';
 import MessageNotification from '../../components/Notification/MessageNotification';
-import { useGridContext } from '../../context/GridContext';
+import { useGridContext } from '../../hooks/useGridContext';
 
 const TaskTypesContent = () => {
   const { columns } = useGridContext();

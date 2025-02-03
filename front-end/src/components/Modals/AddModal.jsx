@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -17,39 +17,48 @@ import * as yup from 'yup';
 import MessageNotification from '../Notification/MessageNotification';
 import { validateEntityType, getEntityDefinition, transform } from '../../utils/entityTypes';
 import { getVisibleColumns } from '../../screens/Tasks/columns';
+import { arrayCompare } from '../../hooks/useDeepCompare';
 
-  const AddModal = ({ open, onClose, onSubmit, entityType, columns }) => {
+
+const AddModal = memo(({ open, onClose, onSubmit, entityType, columns }) => {
+
   validateEntityType(entityType);
+
   const entityDef = getEntityDefinition(entityType);
-  const visibleColumns = getVisibleColumns(entityType, columns);
-  const { requiredFields } = entityDef;
+  const visibleColumns = useMemo(() => 
+    getVisibleColumns(entityType, columns),
+    [entityType, columns]
+  );
 
   const [message, setMessage] = useState({ text: '', type: '', visible: false });
   const [columnOptions, setColumnOptions] = useState({});
 
   useEffect(() => {
+    if (!open) return; 
+
     const fetchOptions = async () => {
       const options = {};
-      for (let column of visibleColumns) {
+      for (const column of visibleColumns) {
         if (column.getOptions) {
           options[column.field] = await column.getOptions();
         }
       }
       setColumnOptions(options);
     };
+
     fetchOptions();
-  }, [visibleColumns]);
+  }, [open, visibleColumns]);
 
   const validationSchema = yup.object().shape(
-    columns.reduce((acc, col) => {
-      acc[col.field] = requiredFields.includes(col.field)
+    visibleColumns.reduce((acc, col) => {
+      acc[col.field] = entityDef.requiredFields.includes(col.field)
         ? yup.string().required('Este campo é obrigatório')
         : yup.string();
       return acc;
     }, {})
   );
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const handleSubmit = useCallback(async (values, { setSubmitting }) => {
     try {
       const transformedData = transform(values, entityType, 'toBackend');
       const result = await onSubmit(transformedData);
@@ -72,7 +81,7 @@ import { getVisibleColumns } from '../../screens/Tasks/columns';
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [onSubmit, onClose, entityType]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -111,7 +120,7 @@ import { getVisibleColumns } from '../../screens/Tasks/columns';
                 gridTemplateColumns="repeat(4, minmax(0, 1fr))"
                 sx={{ mt: 2 }}
               >
-                {columns.map((column) => (
+                {visibleColumns.map((column) => (
                   <Box key={column.field} sx={{ gridColumn: "span 4" }}>
                     {column.type === 'singleSelect' ? (
                       <FormControl
@@ -166,6 +175,10 @@ import { getVisibleColumns } from '../../screens/Tasks/columns';
       </DialogContent>
     </Dialog>
   );
-};
+}, (prevProps, nextProps) => 
+  prevProps.open === nextProps.open &&
+  prevProps.entityType === nextProps.entityType &&
+  arrayCompare(prevProps.columns, nextProps.columns)
+);
 
 export default AddModal;

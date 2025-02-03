@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { Box } from '@mui/material';
-import { GridDefault} from '../../components/Grid/GridDefault'
+import { GridDefault } from '../../components/Grid/GridDefault';
 import { GridActions } from '../../components/Grid/GridActions';
 import { GridFooterActions } from '../../components/Grid/GridFooterActions';
 import { taskServices } from '../../services/taskServices';
 import MessageNotification from '../../components/Notification/MessageNotification';
-import { useGridContext } from '../../context/GridContext';
+import { useGridContext } from '../../hooks/useGridContext';
+import { useTaskOptions } from '../../hooks/useOptions/useTaskOptions';
 
 const TasksContent = () => {
+  const { rawTaskData: data, taskOptions } = useTaskOptions();
   const { columns } = useGridContext();
-  const [data, setData] = useState([]);
+  
   const [selectedRows, setSelectedRows] = useState([]);
   const [message, setMessage] = useState({
     text: '',
@@ -28,30 +30,21 @@ const TasksContent = () => {
     }, 3000);
   }, []);
 
-  const fetchData = useCallback(async () => {
-    const result = await taskServices.getAll();
-    if (result.success) {
-      setData(result.data);
-      setSelectedRows([]);
-    }
-  }, []);
-
   const handleDelete = useCallback(async () => {
     if (selectedRows.length === 0) return;
     const taskToDelete = data.find(task => task.id === selectedRows[0]);
+    if (!taskToDelete) return;
     const result = await taskServices.delete(selectedRows[0], taskToDelete.taskName);
-    
     handleMessage(result.message, result.success ? 'delete' : 'error');
-    
     if (result.success) {
-      await fetchData();
+      setSelectedRows([]);
     }
-  }, [selectedRows, data, fetchData, handleMessage]);
+  }, [selectedRows, data, handleMessage]);
 
   const memoizedMessageNotification = useMemo(() => (
     message.visible && (
       <Box mb="20px" display="flex" justifyContent="center" width="100%">
-        <MessageNotification 
+        <MessageNotification
           message={message.text}
           type={message.type}
           visible={message.visible}
@@ -60,32 +53,26 @@ const TasksContent = () => {
     )
   ), [message]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   return (
     <Box m="20px" position="relative">
       {memoizedMessageNotification}
       
-      <GridActions 
+      <GridActions
         services={taskServices}
-        onSuccess={fetchData}
         entityType="task"
+        options={taskOptions}
       />
       
-      <GridDefault 
+      <GridDefault
         data={data}
         columns={columns}
-        onDataChange={fetchData}
         onRowSelect={setSelectedRows}
         onEditSubmit={taskServices.update}
       />
       
-      <GridFooterActions 
+      <GridFooterActions
         services={taskServices}
         selectedRows={selectedRows}
-        onSuccess={fetchData}
         onDelete={handleDelete}
       />
     </Box>

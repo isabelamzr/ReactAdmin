@@ -1,18 +1,31 @@
-import { createContext, useContext } from 'react';
-const GridContext = createContext();
+import { createContext, memo, useMemo } from 'react';
+import { arrayCompare } from '../hooks/useDeepCompare';
 
-export const GridProvider = ({ children, columns, mainColumn }) => {
-  return (
-    <GridContext.Provider value={{ columns, mainColumn }}>
-      {children}
-    </GridContext.Provider>
+export const GridContext = createContext();
+
+const areColumnsEqual = (prevColumns, nextColumns) => {
+  if (prevColumns === nextColumns) return true;
+  if (prevColumns.length !== nextColumns.length) return false;
+
+  return prevColumns.every((col, index) => 
+    col.field === nextColumns[index].field &&
+    col.type === nextColumns[index].type &&
+    arrayCompare(col.getOptions?.(), nextColumns[index].getOptions?.())
   );
 };
 
-export const useGridContext = () => {
-  const context = useContext(GridContext);
-  if (!context) {
-    throw new Error('useGridContext must be used within a GridProvider');
-  }
-  return context;
-};
+export const GridProvider = memo(({ children, columns, mainColumn }) => {
+  const contextValue = useMemo(() => ({
+    columns,
+    mainColumn
+  }), [columns, mainColumn]);
+
+  return (
+    <GridContext.Provider value={contextValue}>
+      {children}
+    </GridContext.Provider>
+  );
+}, (prevProps, nextProps) =>
+  prevProps.mainColumn === nextProps.mainColumn &&
+  areColumnsEqual(prevProps.columns, nextProps.columns)
+);
